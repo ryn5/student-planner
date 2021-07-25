@@ -1,11 +1,20 @@
-# My Personal Project
+# Student Planner
 
-## A subtitle
+## Proposal
 
-A *bulleted* list:
-- item 1
-- item 2
-- item 3
+This application is geared towards secondary and post secondary students to organize and plan out their daily schedules.
+As a full-time post secondary student, this project is of interest to me because it would be greatly useful to have a
+dedicated application that I can use to keep track of everything I need to do each day.
 
-An example of text with **bold** and *italic* fonts.  Note that the IntelliJ markdown previewer doesn't seem to render 
-the bold and italic fonts correctly but they will appear correctly on GitHub.
+**Functionality:**
+
+- To-do lists for every day of the week
+- Old lists automatically cycle out for new ones each day
+- Customizable filters for sorting tasks
+- Due dates associated with each task
+- Reminders for tasks that are due soon
+- Automatically clears out tasks that are past their due dates
+- Work-list view to see tasks grouped by tag
+
+
+
