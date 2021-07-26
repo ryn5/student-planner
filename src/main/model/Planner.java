@@ -84,13 +84,15 @@ public class Planner {
     // EFFECTS: deletes all tasks in todosPage and dueSoon with given tag, then removes tag from tagsPage and
     //          removes TaskGroup with tag from groupsPage
     public static void deleteTag(Tag tag) {
-        for (TodoList tl : todosPage.getAllTodoLists()) {
-            tl.removeTask(tag);
-        }
-        dueSoon.removeTask(tag);
+        if (tag != null) {
+            for (TodoList tl : todosPage.getAllTodoLists()) {
+                tl.removeTask(tag);
+            }
+            dueSoon.removeTask(tag);
+            groupsPage.removeTaskGroup(tag);
 
-        tagsPage.removeTag(tag.getName());
-        groupsPage.removeTaskGroup(tag);
+            tagsPage.removeTag(tag.getName());
+        }
     }
 
     // EFFECTS: returns dayOfWeek in String format for given calendar
