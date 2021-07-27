@@ -142,7 +142,7 @@ public class Planner {
 
     // MODIFIES: this
     // EFFECTS: adds all tasks with dueIn == 2 to DueSoon
-    public static void addToDueSoon() {
+    public static void addNewDueSoon() {
         for (TaskGroup tg : groupsPage.getTaskGroups()) {
             for (Task t : tg.getTaskList()) {
                 if (t.getDueIn() == 2) {
@@ -158,7 +158,7 @@ public class Planner {
         cycleTodoLists();
         updateDueDates();
         clearOverdueTasks();
-        addToDueSoon();
+        addNewDueSoon();
     }
 
 

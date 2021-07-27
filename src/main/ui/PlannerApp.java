@@ -8,29 +8,33 @@ import model.groupspage.TaskGroup;
 import model.tagspage.Tag;
 import model.todospage.TodoList;
 
+import java.util.Calendar;
 import java.util.Scanner;
 
 // Student planner application
 //  ATTRIBUTIONS: parts of this code were modeled after the following TellerApp:
 //                https://github.students.cs.ubc.ca/CPSC210/TellerApp
 public class PlannerApp {
-    private Scanner input;
     private Planner planner;
+    private Scanner input;
     private boolean running;
+    private String today;
 
     // EFFECTS: instantiates Planner and runs the application
     public PlannerApp() {
-        planner = new Planner();
         runPlanner();
     }
 
     // MODIFIES: this
     // EFFECTS: runs the application by opening the main menu and processes user input
     private void runPlanner() {
-        running = true;
-        input = new Scanner(System.in);
+        init();
 
         while (running) {
+            if (Planner.getDayOfWeekForCalendar(Calendar.getInstance()) != today) {
+                Planner.updateDay();
+            }
+
             displayMenu();
             String command = input.next();
 
@@ -40,6 +44,15 @@ public class PlannerApp {
                 processMenuCommand(command);
             }
         }
+    }
+
+    // MODIFIES: this
+    // EFFECTS: initializes the application
+    private void init() {
+        planner = new Planner();
+        input = new Scanner(System.in);
+        today = Planner.getDayOfWeekForCalendar(Calendar.getInstance());
+        running = true;
     }
 
     // EFFECTS: displays main menu

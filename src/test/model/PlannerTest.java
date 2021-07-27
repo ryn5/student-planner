@@ -103,7 +103,7 @@ public class PlannerTest {
         assertEquals(1, Planner.getDueSoon().getTaskList().size());
 
         Planner.updateDueDates();
-        Planner.addToDueSoon();
+        Planner.addNewDueSoon();
 
         assertEquals(2, Planner.getDueSoon().getTaskList().size());
     }
