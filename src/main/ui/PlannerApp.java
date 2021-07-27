@@ -8,32 +8,33 @@ import model.groupspage.TaskGroup;
 import model.tagspage.Tag;
 import model.todospage.TodoList;
 
-import java.util.Locale;
 import java.util.Scanner;
 
 // Student planner application
-//  ATTRIBUTIONS: parts of code were modeled after the following TellerApp:
+//  ATTRIBUTIONS: parts of this code were modeled after the following TellerApp:
 //                https://github.students.cs.ubc.ca/CPSC210/TellerApp
 public class PlannerApp {
     private Scanner input;
     private Planner planner;
     private boolean running;
 
+    // EFFECTS: instantiates Planner and runs the application
     public PlannerApp() {
         planner = new Planner();
         runPlanner();
     }
 
+    // MODIFIES: this
+    // EFFECTS: runs the application by opening the main menu and processes user input
     private void runPlanner() {
         running = true;
-        String command;
         input = new Scanner(System.in);
 
         while (running) {
             displayMenu();
-            command = input.next().toLowerCase();
+            String command = input.next();
 
-            if (command.equals("q")) {
+            if (command.equals("quit")) {
                 running = false;
             } else {
                 processMenuCommand(command);
@@ -41,6 +42,17 @@ public class PlannerApp {
         }
     }
 
+    // EFFECTS: displays main menu
+    private void displayMenu() {
+        System.out.println("Select a page: ");
+        System.out.println("\ttodos -> Todos Page");
+        System.out.println("\tgroups -> Groups Page");
+        System.out.println("\ttags -> Tags Page");
+        System.out.println("\tquit -> Quit");
+    }
+
+    // MODIFIES: this
+    // EFFECTS: processes user command in main menu to open selected page
     private void processMenuCommand(String command) {
         if (command.equals("todos")) {
             runTodosPage(0);
@@ -51,17 +63,10 @@ public class PlannerApp {
         } else {
             System.out.println("Invalid input.  Please try again.");
         }
-
     }
 
-    private void displayMenu() {
-        System.out.println("Select a page: ");
-        System.out.println("\ttodos -> Todos Page");
-        System.out.println("\tgroups -> Groups Page");
-        System.out.println("\ttags -> Tags Page");
-        System.out.println("\tquit -> Quit");
-    }
-
+    // MODIFIES: this
+    // EFFECTS: displays first to-do list in Todos Page, displays due soon, and takes user input
     private void runTodosPage(int index) {
         printTodoList(index);
         emptyLine();
@@ -79,6 +84,8 @@ public class PlannerApp {
         processTodosCommand(input.next(), index);
     }
 
+    // MODIFIES: this, Planner
+    // EFFECTS: processes user command in Todos Page
     private void processTodosCommand(String command, int currentIndex) {
         if (command.equals("add")) {
             processAddTask(currentIndex);
@@ -97,34 +104,44 @@ public class PlannerApp {
                 runTodosPage(currentIndex - 1);
             }
         } else if (command.equals("back")) {
-            displayMenu();
-            processMenuCommand(input.next());
+            ;
         } else {
             System.out.println("Invalid input.  Please try again.");
             runTodosPage(currentIndex);
         }
     }
 
+    // MODIFIES: this, Planner
+    // EFFECTS: creates new task in current to-do list and rest of Planner
     private void processAddTask(int currentIndex) {
         System.out.println("Enter new task tag, number of days until due date, and a description, separately: ");
+
         String newTaskTag = input.next();
         int newTaskDueIn = Integer.parseInt(input.next());
         String newTaskText = input.next();
+
         Planner.createTask(newTaskTag, newTaskDueIn, newTaskText,
                 Planner.getTodosPage().getAllTodoLists().get(currentIndex).getDayOfWeek());
+
         runTodosPage(currentIndex);
     }
 
+    // MODIFIES: this, Planner
+    // EFFECTS: deletes all instances of task at given index in current to-do list from Planner
     private void processDelTask(int currentIndex) {
         System.out.println("Enter number of task to be deleted: ");
+
         int taskNumber = Integer.parseInt(input.next());
         Planner.deleteTask(Planner.getTodosPage().getAllTodoLists().get(currentIndex).getTask(taskNumber - 1));
+
         runTodosPage(currentIndex);
     }
 
+    // EFFECTS: prints to-do list at given index in Todos Page
     private void printTodoList(int index) {
         TodoList todoList = Planner.getTodosPage().getAllTodoLists().get(index);
         System.out.println(todoList.getDayOfWeek() + ":");
+
         for (Task t : todoList.getTaskList()) {
             String printStatement = " " + (todoList.getTaskList().indexOf(t) + 1) + ". " + t.getTag().getName() + ": "
                     + t.getText() + " (due in " + t.getDueIn() + " days)";
@@ -132,15 +149,19 @@ public class PlannerApp {
         }
     }
 
+    // EFFECTS: prints all tasks that are due soon
     private void printDueSoon() {
         System.out.println("Tasks due soon: ");
         TaskList taskList = Planner.getDueSoon();
+
         for (Task t : taskList.getTaskList()) {
             String printStatement = "\tDue in " + t.getDueIn() + " days: " + t.getText();
             System.out.println(printStatement);
         }
     }
 
+    // MODIFIES: this
+    // EFFECTS: displays tasks grouped by tag and takes user input
     private void runGroupsPage() {
         System.out.println("Tasks grouped by tag: ");
         emptyLine();
@@ -157,16 +178,19 @@ public class PlannerApp {
         processGroupsCommand(input.next());
     }
 
+    // MODIFIES: this
+    // EFFECTS: processes user command in Groups Page
     private void processGroupsCommand(String command) {
         if (command.equals("back")) {
-            displayMenu();
-            processMenuCommand(input.next());
+            ;
         } else {
             System.out.println("Invalid input.  Please try again.");
-            runTagsPage();
+            runGroupsPage();
         }
     }
 
+    // MODIFIES: this
+    // EFFECTS: displays tags and takes user input
     private void runTagsPage() {
         System.out.println("Tags: ");
         emptyLine();
@@ -182,9 +206,10 @@ public class PlannerApp {
         System.out.println("\tback -> return to menu");
 
         processTagsCommand(input.next());
-
     }
 
+    // MODIFIES: this, Planner
+    // EFFECTS: processes user command in Tags Page
     private void processTagsCommand(String command) {
         if (command.equals("add")) {
             System.out.println("Enter new tag name: ");
@@ -200,14 +225,14 @@ public class PlannerApp {
             Planner.deleteTag(Planner.getTagsPage().getTag(input.next()));
             runTagsPage();
         } else if (command.equals("back")) {
-            displayMenu();
-            processMenuCommand(input.next());
+            ;
         } else {
             System.out.println("Invalid input.  Please try again.");
             runTagsPage();
         }
     }
 
+    // EFFECTS: prints empty line
     private void emptyLine() {
         System.out.println("");
     }
