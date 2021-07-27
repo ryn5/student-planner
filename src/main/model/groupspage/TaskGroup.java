@@ -4,6 +4,7 @@ import model.tagspage.Tag;
 import model.Task;
 import model.TaskList;
 
+// Represents a group of tasks with the same tag
 public class TaskGroup extends TaskList {
     private Tag tag;
 

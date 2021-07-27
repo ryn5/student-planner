@@ -6,6 +6,7 @@ import model.tagspage.Tag;
 import java.util.ArrayList;
 import java.util.List;
 
+// Represents a list of task groups
 public class TaskGroups {
     private List<TaskGroup> taskGroups;
 

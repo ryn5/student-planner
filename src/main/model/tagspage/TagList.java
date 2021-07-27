@@ -6,6 +6,7 @@ import model.Planner;
 import java.util.ArrayList;
 import java.util.List;
 
+// Represents a list of tags
 public class TagList {
     private List<Tag> tagList;
 

@@ -5,6 +5,7 @@ import model.Task;
 import java.util.ArrayList;
 import java.util.List;
 
+// Represents a group of TodoLists, one per day of the week
 public class AllTodoLists {
     private List<TodoList> allTodoLists;
 

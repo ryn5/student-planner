@@ -1,5 +1,6 @@
 package model.tagspage;
 
+// A tag that can be attached to tasks
 public class Tag {
     private final String name;
 

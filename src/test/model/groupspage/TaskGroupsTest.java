@@ -38,15 +38,15 @@ public class TaskGroupsTest {
 
     }
 
-    @Test
-    void testRemoveTaskGroup () {
-        taskGroups.addTaskGroup(tag1);
-        taskGroups.addTaskGroup(tag2);
-
-        taskGroups.removeTaskGroup(tag1);
-        assertEquals(1, taskGroups.getTaskGroups().size());
-        assertEquals(tag2, taskGroups.getTaskGroups().get(0).getTag());
-    }
+//    @Test
+//    void testRemoveTaskGroup () {
+//        taskGroups.addTaskGroup(tag1);
+//        taskGroups.addTaskGroup(tag2);
+//
+//        taskGroups.removeTaskGroup(tag1);
+//        assertEquals(1, taskGroups.getTaskGroups().size());
+//        assertEquals(tag2, taskGroups.getTaskGroups().get(0).getTag());
+//    }
 
     @Test
     void testAddTaskToCorrectTaskGroup() {

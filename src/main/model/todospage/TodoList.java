@@ -1,8 +1,8 @@
 package model.todospage;
 
-import model.Task;
 import model.TaskList;
 
+// Represents a list of tasks associated with a day of the week
 public class TodoList extends TaskList {
     String dayOfWeek;
 

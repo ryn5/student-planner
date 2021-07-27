@@ -2,6 +2,7 @@ package model;
 
 import model.tagspage.Tag;
 
+// Represents a task with a tag, number of days until its due date, and a description
 public class Task {
     private final Tag tag;
     private int dueIn;
