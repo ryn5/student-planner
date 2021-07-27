@@ -49,6 +49,16 @@ public class TaskGroupsTest {
     }
 
     @Test
+    void testAddTaskToCorrectTaskGroup() {
+        taskGroups.addTaskGroup(tag1);
+        taskGroups.addTaskGroup(tag2);
+
+        taskGroups.addTaskToCorrectTaskGroup(task3);
+
+        assertEquals(1, taskGroups.getTaskGroups().get(1).getTaskList().size());
+    }
+
+    @Test
     void testClearOverdueTasks () {
         taskGroups.addTaskGroup(tag1);
         taskGroups.addTaskGroup(tag2);
