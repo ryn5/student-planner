@@ -9,6 +9,7 @@ import model.tagspage.Tag;
 import model.todospage.TodoList;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Scanner;
 
 // Student planner application
@@ -18,7 +19,7 @@ public class PlannerApp {
     private Planner planner;
     private Scanner input;
     private boolean running;
-    private String today;
+    private Date today;
 
     // EFFECTS: instantiates Planner and runs the application
     public PlannerApp() {
@@ -31,8 +32,8 @@ public class PlannerApp {
         init();
 
         while (running) {
-            if (Planner.getDayOfWeekForCalendar(Calendar.getInstance()) != today) {
-                Planner.updateDay();
+            while (!planner.formatDate(planner.getCurrentDate()).equals(planner.formatDate(today))) {
+                planner.updateDay();
             }
 
             displayMenu();
@@ -51,7 +52,7 @@ public class PlannerApp {
     private void init() {
         planner = new Planner();
         input = new Scanner(System.in);
-        today = Planner.getDayOfWeekForCalendar(Calendar.getInstance());
+        today = Calendar.getInstance().getTime();
         running = true;
     }
 
@@ -61,20 +62,27 @@ public class PlannerApp {
         System.out.println("\ttodos -> Todos Page");
         System.out.println("\tgroups -> Groups Page");
         System.out.println("\ttags -> Tags Page");
+        System.out.println("\tsave -> Tags Page");
+        System.out.println("\tload -> Tags Page");
         System.out.println("\tquit -> Quit");
     }
 
     // MODIFIES: this
     // EFFECTS: processes user command in main menu to open selected page
     private void processMenuCommand(String command) {
-        if (command.equals("todos")) {
-            runTodosPage(0);
-        } else if (command.equals("groups")) {
-            runGroupsPage();
-        } else if (command.equals("tags")) {
-            runTagsPage();
-        } else {
-            System.out.println("Invalid input.  Please try again.");
+        switch (command) {
+            case "todos":
+                runTodosPage(0);
+                break;
+            case "groups":
+                runGroupsPage();
+                break;
+            case "tags":
+                runTagsPage();
+                break;
+            default:
+                System.out.println("Invalid input.  Please try again.");
+                break;
         }
     }
 
@@ -100,27 +108,26 @@ public class PlannerApp {
     // MODIFIES: this, Planner
     // EFFECTS: processes user command in Todos Page
     private void processTodosCommand(String command, int currentIndex) {
-        if (command.equals("add")) {
-            processAddTask(currentIndex);
-        } else if (command.equals("del")) {
-            processDelTask(currentIndex);
-        } else if (command.equals("next")) {
-            if (currentIndex == 6) {
-                runTodosPage(0);
-            } else {
-                runTodosPage(currentIndex + 1);
-            }
-        } else if (command.equals("prev")) {
-            if (currentIndex == 0) {
-                runTodosPage(6);
-            } else {
-                runTodosPage(currentIndex - 1);
-            }
-        } else if (command.equals("back")) {
-            ;
-        } else {
-            System.out.println("Invalid input.  Please try again.");
-            runTodosPage(currentIndex);
+        switch (command) {
+            case "add":
+                processAddTask(currentIndex);
+                break;
+            case "del":
+                processDelTask(currentIndex);
+                break;
+            case "next":
+                processNextList(currentIndex);
+                break;
+            case "prev":
+                processPrevList(currentIndex);
+                break;
+            case "back":
+                ;
+                break;
+            default:
+                System.out.println("Invalid input.  Please try again.");
+                runTodosPage(currentIndex);
+                break;
         }
     }
 
@@ -133,8 +140,8 @@ public class PlannerApp {
         int newTaskDueIn = Integer.parseInt(input.next());
         String newTaskText = input.next();
 
-        Planner.createTask(newTaskTag, newTaskDueIn, newTaskText,
-                Planner.getTodosPage().getAllTodoLists().get(currentIndex).getDayOfWeek());
+        planner.createTask(newTaskTag, newTaskDueIn, newTaskText,
+                planner.getTodosPage().getAllTodoLists().get(currentIndex).getDayOfWeek());
 
         runTodosPage(currentIndex);
     }
@@ -145,14 +152,34 @@ public class PlannerApp {
         System.out.println("Enter number of task to be deleted: ");
 
         int taskNumber = Integer.parseInt(input.next());
-        Planner.deleteTask(Planner.getTodosPage().getAllTodoLists().get(currentIndex).getTask(taskNumber - 1));
+        planner.deleteTask(planner.getTodosPage().getAllTodoLists().get(currentIndex).getTask(taskNumber - 1));
 
         runTodosPage(currentIndex);
     }
 
+    // MODIFIES: this
+    // EFFECTS: displays next to-do list
+    private void processNextList(int currentIndex) {
+        if (currentIndex == 6) {
+            runTodosPage(0);
+        } else {
+            runTodosPage(currentIndex + 1);
+        }
+    }
+
+    // MODIFIES: this
+    // EFFECTS: displays previous to-do list
+    private void processPrevList(int currentIndex) {
+        if (currentIndex == 0) {
+            runTodosPage(6);
+        } else {
+            runTodosPage(currentIndex - 1);
+        }
+    }
+
     // EFFECTS: prints to-do list at given index in Todos Page
     private void printTodoList(int index) {
-        TodoList todoList = Planner.getTodosPage().getAllTodoLists().get(index);
+        TodoList todoList = planner.getTodosPage().getAllTodoLists().get(index);
         System.out.println(todoList.getDayOfWeek() + ":");
 
         for (Task t : todoList.getTaskList()) {
@@ -165,7 +192,7 @@ public class PlannerApp {
     // EFFECTS: prints all tasks that are due soon
     private void printDueSoon() {
         System.out.println("Tasks due soon: ");
-        TaskList taskList = Planner.getDueSoon();
+        TaskList taskList = planner.getDueSoon();
 
         for (Task t : taskList.getTaskList()) {
             String printStatement = "\tDue in " + t.getDueIn() + " days: " + t.getText();
@@ -179,7 +206,7 @@ public class PlannerApp {
         System.out.println("Tasks grouped by tag: ");
         emptyLine();
 
-        for (TaskGroup tg : Planner.getGroupsPage().getTaskGroups()) {
+        for (TaskGroup tg : planner.getGroupsPage().getTaskGroups()) {
             System.out.println(tg.getTag().getName() + ": ");
             for (Task t : tg.getTaskList()) {
                 String printStatement = "\t" + t.getText() + " (due in " + t.getDueIn() + " days)";
@@ -208,7 +235,7 @@ public class PlannerApp {
         System.out.println("Tags: ");
         emptyLine();
 
-        for (Tag t : Planner.getTagsPage().getTagList()) {
+        for (Tag t : planner.getTagsPage().getTagList()) {
             System.out.println(t.getName());
         }
         emptyLine();
@@ -224,26 +251,36 @@ public class PlannerApp {
     // MODIFIES: this, Planner
     // EFFECTS: processes user command in Tags Page
     private void processTagsCommand(String command) {
-        if (command.equals("add")) {
-            System.out.println("Enter new tag name: ");
-            try {
-                Planner.createTag(input.next());
-            } catch (TagAlreadyExistsException e) {
-                System.out.println("Tag with name already exists.");
-            } finally {
+        switch (command) {
+            case "add":
+                processAddTag();
+                break;
+            case "del":
+                System.out.println("Enter name of tag to be deleted: ");
+                planner.deleteTag(planner.getTagsPage().getTag(input.next()));
                 runTagsPage();
-            }
-        } else if (command.equals("del")) {
-            System.out.println("Enter name of tag to be deleted: ");
-            Planner.deleteTag(Planner.getTagsPage().getTag(input.next()));
-            runTagsPage();
-        } else if (command.equals("back")) {
-            ;
-        } else {
-            System.out.println("Invalid input.  Please try again.");
+                break;
+            case "back":
+                ;
+                break;
+            default:
+                System.out.println("Invalid input.  Please try again.");
+                runTagsPage();
+                break;
+        }
+    }
+
+    private void processAddTag() {
+        System.out.println("Enter new tag name: ");
+        try {
+            planner.createTag(input.next());
+        } catch (TagAlreadyExistsException e) {
+            System.out.println("Tag with name already exists.");
+        } finally {
             runTagsPage();
         }
     }
+
 
     // EFFECTS: prints empty line
     private void emptyLine() {

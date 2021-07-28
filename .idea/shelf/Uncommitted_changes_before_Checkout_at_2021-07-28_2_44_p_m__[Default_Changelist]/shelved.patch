@@ -1,0 +1,348 @@
+Index: src/test/model/PlannerTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package model;\r\n\r\nimport exceptions.TagAlreadyExistsException;\r\nimport org.junit.jupiter.api.BeforeEach;\r\nimport org.junit.jupiter.api.Test;\r\n\r\nimport java.util.Calendar;\r\n\r\nimport static org.junit.jupiter.api.Assertions.*;\r\n\r\npublic class PlannerTest {\r\n    Planner planner = new Planner();\r\n    Calendar today;\r\n    Calendar tomorrow;\r\n\r\n    @BeforeEach\r\n    void setup() {\r\n        today = Calendar.getInstance();\r\n        tomorrow = Calendar.getInstance();\r\n        tomorrow.add(Calendar.DAY_OF_YEAR, 1);\r\n    }\r\n\r\n    @Test\r\n    void testCreateTag() throws TagAlreadyExistsException {\r\n        Planner.createTag(\"Tag\");\r\n\r\n        assertEquals(1, Planner.getTagsPage().getTagList().size());\r\n        assertEquals(1, Planner.getGroupsPage().getTaskGroups().size());\r\n    }\r\n\r\n    @Test\r\n    void testDeleteTag() throws TagAlreadyExistsException {\r\n        Planner.createTag(\"Tag\");\r\n        Planner.createTask(\"Tag\", 2, \"task1\", \"Tuesday\");\r\n        Planner.createTask(\"Tag\", 3, \"task2\", \"Tuesday\");\r\n\r\n        Planner.deleteTag(Planner.getTagsPage().getTag(\"Tag\"));\r\n        assertEquals(0, Planner.getTodosPage().getTodoList(\"Tuesday\").getTaskList().size());\r\n        assertEquals(0, Planner.getDueSoon().getTaskList().size());\r\n        assertEquals(0, Planner.getGroupsPage().getTaskGroups().size());\r\n    }\r\n\r\n    @Test\r\n    void testDeleteTagNotFound() throws TagAlreadyExistsException {\r\n        Planner.createTag(\"Tag\");\r\n        Planner.createTask(\"Tag\", 2, \"task1\", \"Tuesday\");\r\n        Planner.createTask(\"Tag\", 3, \"task2\", \"Tuesday\");\r\n\r\n        Planner.deleteTag(Planner.getTagsPage().getTag(\"Tag2\"));\r\n        assertEquals(2, Planner.getTodosPage().getTodoList(\"Tuesday\").getTaskList().size());\r\n        assertEquals(1, Planner.getDueSoon().getTaskList().size());\r\n        assertEquals(1, Planner.getGroupsPage().getTaskGroups().size());\r\n    }\r\n\r\n    @Test\r\n    void testCreateTask() throws TagAlreadyExistsException {\r\n        Planner.createTag(\"Tag\");\r\n\r\n        Planner.createTask(\"Tag\", 2, \"task1\", \"Tuesday\");\r\n        Planner.createTask(\"Tag\", 3, \"task2\", \"Tuesday\");\r\n\r\n        assertEquals(2, Planner.getTodosPage().getTodoList(\"Tuesday\").getTaskList().size());\r\n        assertEquals(1, Planner.getDueSoon().getTaskList().size());\r\n        assertEquals(2, Planner.getGroupsPage().getTaskGroups().get(0).getTaskList().size());\r\n    }\r\n\r\n    @Test\r\n    void testDeleteTask() throws TagAlreadyExistsException {\r\n        Planner.createTag(\"Tag\");\r\n        Planner.createTask(\"Tag\", 2, \"task1\", \"Tuesday\");\r\n\r\n        Planner.deleteTask(Planner.getDueSoon().getTask(0));\r\n\r\n        assertEquals(0, Planner.getTodosPage().getTodoList(\"Tuesday\").getTaskList().size());\r\n        assertEquals(0, Planner.getDueSoon().getTaskList().size());\r\n        assertEquals(0, Planner.getGroupsPage().getTaskGroups().get(0).getTaskList().size());\r\n\r\n    }\r\n\r\n    @Test\r\n    void testGetDayOfWeekToday() {\r\n        assertEquals(\"String\".getClass(), Planner.getDayOfWeekForCalendar(today).getClass());\r\n    }\r\n\r\n    @Test\r\n    void testUpdateDueDates() throws TagAlreadyExistsException {\r\n        Planner.createTag(\"Tag\");\r\n        Planner.createTask(\"Tag\", 2, \"task1\", \"Tuesday\");\r\n        Planner.createTask(\"Tag\", 0, \"task2\", \"Tuesday\");\r\n\r\n        Planner.updateDueDates();\r\n\r\n        assertEquals(1, Planner.getDueSoon().getTask(0).getDueIn());\r\n        assertEquals(-1, Planner.getDueSoon().getTask(1).getDueIn());\r\n\r\n    }\r\n\r\n    @Test\r\n    void testClearOverDueTasks() throws TagAlreadyExistsException {\r\n        Planner.createTag(\"Tag\");\r\n        Planner.createTask(\"Tag\", -1, \"task1\", \"Tuesday\");\r\n        Planner.createTask(\"Tag\", 0, \"task2\", \"Tuesday\");\r\n\r\n        Planner.clearOverdueTasks();\r\n\r\n        assertEquals(1, Planner.getDueSoon().getTaskList().size());\r\n    }\r\n\r\n    @Test\r\n    void testAddToDueSoon() throws TagAlreadyExistsException {\r\n        Planner.createTag(\"Tag\");\r\n        Planner.createTask(\"Tag\", 3, \"task1\", \"Tuesday\");\r\n        Planner.createTask(\"Tag\", 0, \"task2\", \"Tuesday\");\r\n\r\n        assertEquals(1, Planner.getDueSoon().getTaskList().size());\r\n\r\n        Planner.updateDueDates();\r\n        Planner.addNewDueSoon();\r\n\r\n        assertEquals(2, Planner.getDueSoon().getTaskList().size());\r\n    }\r\n\r\n    @Test\r\n    void testUpdateDay() throws TagAlreadyExistsException {\r\n        Planner.createTag(\"Tag\");\r\n        Planner.createTask(\"Tag\", 3, \"task1\", \"Tuesday\");\r\n        Planner.createTask(\"Tag\", 0, \"task2\", \"Tuesday\");\r\n\r\n        Planner.updateDay();\r\n\r\n        assertEquals(Planner.getDayOfWeekForCalendar(tomorrow),\r\n                Planner.getTodosPage().getAllTodoLists().get(0).getDayOfWeek());\r\n        assertEquals(1, Planner.getTodosPage().\r\n                getTodoList(Planner.getDayOfWeekForCalendar(tomorrow)).getTaskList().size());\r\n        assertEquals(1, Planner.getDueSoon().getTaskList().size());\r\n        assertEquals(1, Planner.getGroupsPage().getTaskGroups().get(0).getTaskList().size());\r\n\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/model/PlannerTest.java b/src/test/model/PlannerTest.java
+--- a/src/test/model/PlannerTest.java	
++++ b/src/test/model/PlannerTest.java	
+@@ -130,8 +130,6 @@
+ 
+         assertEquals(Planner.getDayOfWeekForCalendar(tomorrow),
+                 Planner.getTodosPage().getAllTodoLists().get(0).getDayOfWeek());
+-        assertEquals(1, Planner.getTodosPage().
+-                getTodoList(Planner.getDayOfWeekForCalendar(tomorrow)).getTaskList().size());
+         assertEquals(1, Planner.getDueSoon().getTaskList().size());
+         assertEquals(1, Planner.getGroupsPage().getTaskGroups().get(0).getTaskList().size());
+ 
+Index: src/main/ui/PlannerApp.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ui;\r\n\r\nimport exceptions.TagAlreadyExistsException;\r\nimport model.Planner;\r\nimport model.Task;\r\nimport model.TaskList;\r\nimport model.groupspage.TaskGroup;\r\nimport model.tagspage.Tag;\r\nimport model.todospage.TodoList;\r\n\r\nimport java.util.Calendar;\r\nimport java.util.Scanner;\r\n\r\n// Student planner application\r\n//  ATTRIBUTIONS: parts of this code were modeled after the following TellerApp:\r\n//                https://github.students.cs.ubc.ca/CPSC210/TellerApp\r\npublic class PlannerApp {\r\n    private Planner planner;\r\n    private Scanner input;\r\n    private boolean running;\r\n    private String today;\r\n\r\n    // EFFECTS: instantiates Planner and runs the application\r\n    public PlannerApp() {\r\n        runPlanner();\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: runs the application by opening the main menu and processes user input\r\n    private void runPlanner() {\r\n        init();\r\n\r\n        while (running) {\r\n            if (Planner.getDayOfWeekForCalendar(Calendar.getInstance()) != today) {\r\n                Planner.updateDay();\r\n            }\r\n\r\n            displayMenu();\r\n            String command = input.next();\r\n\r\n            if (command.equals(\"quit\")) {\r\n                running = false;\r\n            } else {\r\n                processMenuCommand(command);\r\n            }\r\n        }\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: initializes the application\r\n    private void init() {\r\n        planner = new Planner();\r\n        input = new Scanner(System.in);\r\n        today = Planner.getDayOfWeekForCalendar(Calendar.getInstance());\r\n        running = true;\r\n    }\r\n\r\n    // EFFECTS: displays main menu\r\n    private void displayMenu() {\r\n        System.out.println(\"Select a page: \");\r\n        System.out.println(\"\\ttodos -> Todos Page\");\r\n        System.out.println(\"\\tgroups -> Groups Page\");\r\n        System.out.println(\"\\ttags -> Tags Page\");\r\n        System.out.println(\"\\tquit -> Quit\");\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: processes user command in main menu to open selected page\r\n    private void processMenuCommand(String command) {\r\n        if (command.equals(\"todos\")) {\r\n            runTodosPage(0);\r\n        } else if (command.equals(\"groups\")) {\r\n            runGroupsPage();\r\n        } else if (command.equals(\"tags\")) {\r\n            runTagsPage();\r\n        } else {\r\n            System.out.println(\"Invalid input.  Please try again.\");\r\n        }\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: displays first to-do list in Todos Page, displays due soon, and takes user input\r\n    private void runTodosPage(int index) {\r\n        printTodoList(index);\r\n        emptyLine();\r\n\r\n        printDueSoon();\r\n        emptyLine();\r\n\r\n        System.out.println(\"Select an action: \");\r\n        System.out.println(\"\\tadd -> add new task\");\r\n        System.out.println(\"\\tdel -> delete a task\");\r\n        System.out.println(\"\\tnext -> next list\");\r\n        System.out.println(\"\\tprev -> previous list\");\r\n        System.out.println(\"\\tback -> return to menu\");\r\n\r\n        processTodosCommand(input.next(), index);\r\n    }\r\n\r\n    // MODIFIES: this, Planner\r\n    // EFFECTS: processes user command in Todos Page\r\n    private void processTodosCommand(String command, int currentIndex) {\r\n        if (command.equals(\"add\")) {\r\n            processAddTask(currentIndex);\r\n        } else if (command.equals(\"del\")) {\r\n            processDelTask(currentIndex);\r\n        } else if (command.equals(\"next\")) {\r\n            if (currentIndex == 6) {\r\n                runTodosPage(0);\r\n            } else {\r\n                runTodosPage(currentIndex + 1);\r\n            }\r\n        } else if (command.equals(\"prev\")) {\r\n            if (currentIndex == 0) {\r\n                runTodosPage(6);\r\n            } else {\r\n                runTodosPage(currentIndex - 1);\r\n            }\r\n        } else if (command.equals(\"back\")) {\r\n            ;\r\n        } else {\r\n            System.out.println(\"Invalid input.  Please try again.\");\r\n            runTodosPage(currentIndex);\r\n        }\r\n    }\r\n\r\n    // MODIFIES: this, Planner\r\n    // EFFECTS: creates new task in current to-do list and rest of Planner\r\n    private void processAddTask(int currentIndex) {\r\n        System.out.println(\"Enter new task tag, number of days until due date, and a description, separately: \");\r\n\r\n        String newTaskTag = input.next();\r\n        int newTaskDueIn = Integer.parseInt(input.next());\r\n        String newTaskText = input.next();\r\n\r\n        Planner.createTask(newTaskTag, newTaskDueIn, newTaskText,\r\n                Planner.getTodosPage().getAllTodoLists().get(currentIndex).getDayOfWeek());\r\n\r\n        runTodosPage(currentIndex);\r\n    }\r\n\r\n    // MODIFIES: this, Planner\r\n    // EFFECTS: deletes all instances of task at given index in current to-do list from Planner\r\n    private void processDelTask(int currentIndex) {\r\n        System.out.println(\"Enter number of task to be deleted: \");\r\n\r\n        int taskNumber = Integer.parseInt(input.next());\r\n        Planner.deleteTask(Planner.getTodosPage().getAllTodoLists().get(currentIndex).getTask(taskNumber - 1));\r\n\r\n        runTodosPage(currentIndex);\r\n    }\r\n\r\n    // EFFECTS: prints to-do list at given index in Todos Page\r\n    private void printTodoList(int index) {\r\n        TodoList todoList = Planner.getTodosPage().getAllTodoLists().get(index);\r\n        System.out.println(todoList.getDayOfWeek() + \":\");\r\n\r\n        for (Task t : todoList.getTaskList()) {\r\n            String printStatement = \" \" + (todoList.getTaskList().indexOf(t) + 1) + \". \" + t.getTag().getName() + \": \"\r\n                    + t.getText() + \" (due in \" + t.getDueIn() + \" days)\";\r\n            System.out.println(printStatement);\r\n        }\r\n    }\r\n\r\n    // EFFECTS: prints all tasks that are due soon\r\n    private void printDueSoon() {\r\n        System.out.println(\"Tasks due soon: \");\r\n        TaskList taskList = Planner.getDueSoon();\r\n\r\n        for (Task t : taskList.getTaskList()) {\r\n            String printStatement = \"\\tDue in \" + t.getDueIn() + \" days: \" + t.getText();\r\n            System.out.println(printStatement);\r\n        }\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: displays tasks grouped by tag and takes user input\r\n    private void runGroupsPage() {\r\n        System.out.println(\"Tasks grouped by tag: \");\r\n        emptyLine();\r\n\r\n        for (TaskGroup tg : Planner.getGroupsPage().getTaskGroups()) {\r\n            System.out.println(tg.getTag().getName() + \": \");\r\n            for (Task t : tg.getTaskList()) {\r\n                String printStatement = \"\\t\" + t.getText() + \" (due in \" + t.getDueIn() + \" days)\";\r\n                System.out.println(printStatement);\r\n                emptyLine();\r\n            }\r\n        }\r\n        System.out.println(\"Enter \\\"back\\\" for menu.\");\r\n        processGroupsCommand(input.next());\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: processes user command in Groups Page\r\n    private void processGroupsCommand(String command) {\r\n        if (command.equals(\"back\")) {\r\n            ;\r\n        } else {\r\n            System.out.println(\"Invalid input.  Please try again.\");\r\n            runGroupsPage();\r\n        }\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: displays tags and takes user input\r\n    private void runTagsPage() {\r\n        System.out.println(\"Tags: \");\r\n        emptyLine();\r\n\r\n        for (Tag t : Planner.getTagsPage().getTagList()) {\r\n            System.out.println(t.getName());\r\n        }\r\n        emptyLine();\r\n\r\n        System.out.println(\"Select an action: \");\r\n        System.out.println(\"\\tadd -> add new tag\");\r\n        System.out.println(\"\\tdel -> delete a tag\");\r\n        System.out.println(\"\\tback -> return to menu\");\r\n\r\n        processTagsCommand(input.next());\r\n    }\r\n\r\n    // MODIFIES: this, Planner\r\n    // EFFECTS: processes user command in Tags Page\r\n    private void processTagsCommand(String command) {\r\n        if (command.equals(\"add\")) {\r\n            System.out.println(\"Enter new tag name: \");\r\n            try {\r\n                Planner.createTag(input.next());\r\n            } catch (TagAlreadyExistsException e) {\r\n                System.out.println(\"Tag with name already exists.\");\r\n            } finally {\r\n                runTagsPage();\r\n            }\r\n        } else if (command.equals(\"del\")) {\r\n            System.out.println(\"Enter name of tag to be deleted: \");\r\n            Planner.deleteTag(Planner.getTagsPage().getTag(input.next()));\r\n            runTagsPage();\r\n        } else if (command.equals(\"back\")) {\r\n            ;\r\n        } else {\r\n            System.out.println(\"Invalid input.  Please try again.\");\r\n            runTagsPage();\r\n        }\r\n    }\r\n\r\n    // EFFECTS: prints empty line\r\n    private void emptyLine() {\r\n        System.out.println(\"\");\r\n    }\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/ui/PlannerApp.java b/src/main/ui/PlannerApp.java
+--- a/src/main/ui/PlannerApp.java	
++++ b/src/main/ui/PlannerApp.java	
+@@ -7,8 +7,15 @@
+ import model.groupspage.TaskGroup;
+ import model.tagspage.Tag;
+ import model.todospage.TodoList;
++import persistence.JsonReader;
++import persistence.JsonWriter;
+ 
++import java.io.FileNotFoundException;
++import java.io.IOException;
++import java.text.DateFormat;
++import java.text.SimpleDateFormat;
+ import java.util.Calendar;
++import java.util.Date;
+ import java.util.Scanner;
+ 
+ // Student planner application
+@@ -18,7 +25,11 @@
+     private Planner planner;
+     private Scanner input;
+     private boolean running;
+-    private String today;
++    private Date today;
++
++    private JsonWriter jsonWriter;
++    private JsonReader jsonReader;
++    private static final String JSON_STORE = "./data/planner.json";
+ 
+     // EFFECTS: instantiates Planner and runs the application
+     public PlannerApp() {
+@@ -31,7 +42,7 @@
+         init();
+ 
+         while (running) {
+-            if (Planner.getDayOfWeekForCalendar(Calendar.getInstance()) != today) {
++            while (!Planner.dateToString(today).equals(Planner.dateToString(Planner.getToday()))) {
+                 Planner.updateDay();
+             }
+ 
+@@ -51,8 +62,11 @@
+     private void init() {
+         planner = new Planner();
+         input = new Scanner(System.in);
+-        today = Planner.getDayOfWeekForCalendar(Calendar.getInstance());
++        today = Calendar.getInstance().getTime();
+         running = true;
++
++        jsonWriter = new JsonWriter(JSON_STORE);
++        jsonReader = new JsonReader(JSON_STORE);
+     }
+ 
+     // EFFECTS: displays main menu
+@@ -61,20 +75,33 @@
+         System.out.println("\ttodos -> Todos Page");
+         System.out.println("\tgroups -> Groups Page");
+         System.out.println("\ttags -> Tags Page");
++        System.out.println("\tsave -> Save planner to file");
++        System.out.println("\tload -> Load planner from file");
+         System.out.println("\tquit -> Quit");
+     }
+ 
+     // MODIFIES: this
+     // EFFECTS: processes user command in main menu to open selected page
+     private void processMenuCommand(String command) {
+-        if (command.equals("todos")) {
+-            runTodosPage(0);
+-        } else if (command.equals("groups")) {
+-            runGroupsPage();
+-        } else if (command.equals("tags")) {
+-            runTagsPage();
+-        } else {
+-            System.out.println("Invalid input.  Please try again.");
++        switch (command) {
++            case "todos":
++                runTodosPage(0);
++                break;
++            case "groups":
++                runGroupsPage();
++                break;
++            case "tags":
++                runTagsPage();
++                break;
++            case "save":
++                savePlanner();
++                break;
++            case "load":
++                loadPlanner();
++                break;
++            default:
++                System.out.println("Invalid input.  Please try again.");
++                break;
+         }
+     }
+ 
+@@ -100,27 +127,46 @@
+     // MODIFIES: this, Planner
+     // EFFECTS: processes user command in Todos Page
+     private void processTodosCommand(String command, int currentIndex) {
+-        if (command.equals("add")) {
+-            processAddTask(currentIndex);
+-        } else if (command.equals("del")) {
+-            processDelTask(currentIndex);
+-        } else if (command.equals("next")) {
+-            if (currentIndex == 6) {
+-                runTodosPage(0);
+-            } else {
+-                runTodosPage(currentIndex + 1);
+-            }
+-        } else if (command.equals("prev")) {
+-            if (currentIndex == 0) {
+-                runTodosPage(6);
+-            } else {
+-                runTodosPage(currentIndex - 1);
+-            }
+-        } else if (command.equals("back")) {
+-            ;
+-        } else {
+-            System.out.println("Invalid input.  Please try again.");
+-            runTodosPage(currentIndex);
++        switch (command) {
++            case "add":
++                processAddTask(currentIndex);
++                break;
++            case "del":
++                processDelTask(currentIndex);
++                break;
++            case "next":
++                processNextTodoList(currentIndex);
++                break;
++            case "prev":
++                processPrevTodoList(currentIndex);
++                break;
++            case "back":
++                ;
++                break;
++            default:
++                System.out.println("Invalid input.  Please try again.");
++                runTodosPage(currentIndex);
++                break;
++        }
++    }
++
++    // MODIFIES: this
++    // EFFECTS: displays next to-do list
++    private void processNextTodoList(int currentIndex) {
++        if (currentIndex == 6) {
++            runTodosPage(0);
++        } else {
++            runTodosPage(currentIndex + 1);
++        }
++    }
++
++    // MODIFIES: this
++    // EFFECTS: displays previous to-do list
++    private void processPrevTodoList(int currentIndex) {
++        if (currentIndex == 0) {
++            runTodosPage(6);
++        } else {
++            runTodosPage(currentIndex - 1);
+         }
+     }
+ 
+@@ -224,24 +270,28 @@
+     // MODIFIES: this, Planner
+     // EFFECTS: processes user command in Tags Page
+     private void processTagsCommand(String command) {
+-        if (command.equals("add")) {
+-            System.out.println("Enter new tag name: ");
+-            try {
+-                Planner.createTag(input.next());
+-            } catch (TagAlreadyExistsException e) {
+-                System.out.println("Tag with name already exists.");
+-            } finally {
+-                runTagsPage();
+-            }
+-        } else if (command.equals("del")) {
+-            System.out.println("Enter name of tag to be deleted: ");
+-            Planner.deleteTag(Planner.getTagsPage().getTag(input.next()));
+-            runTagsPage();
+-        } else if (command.equals("back")) {
+-            ;
+-        } else {
+-            System.out.println("Invalid input.  Please try again.");
+-            runTagsPage();
++        switch (command) {
++            case "add":
++                System.out.println("Enter new tag name: ");
++                try {
++                    Planner.createTag(input.next());
++                } catch (TagAlreadyExistsException e) {
++                    System.out.println("Tag with name already exists.");
++                } finally {
++                    runTagsPage();
++                }
++                break;
++            case "del":
++                System.out.println("Enter name of tag to be deleted: ");
++                Planner.deleteTag(Planner.getTagsPage().getTag(input.next()));
++                runTagsPage();
++                break;
++            case "back":
++                break;
++            default:
++                System.out.println("Invalid input.  Please try again.");
++                runTagsPage();
++                break;
+         }
+     }
+ 
+@@ -250,4 +300,28 @@
+         System.out.println("");
+     }
+ 
++    // EFFECTS: saves planner state to JSON_STORE file
++    private void savePlanner() {
++        try {
++            jsonWriter.open();
++            jsonWriter.write(planner);
++            jsonWriter.close();
++            System.out.println("Successfully saved planner state to " + JSON_STORE);
++        } catch (FileNotFoundException e) {
++            System.out.println("Couldn't find the following file: " + JSON_STORE);
++            ;
++        }
++    }
++
++    // MODIFIES: this
++    // EFFECTS: loads planner state from JSON_STORE file
++    private void loadPlanner() {
++        try {
++            planner = jsonReader.read();
++            System.out.println("Loaded planner state from " + JSON_STORE);
++        } catch (IOException | TagAlreadyExistsException e) {
++            System.out.println("Couldn't read the following file: " + JSON_STORE);
++        }
++    }
++
+ }
+Index: Project-Starter.iml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<module type=\"JAVA_MODULE\" version=\"4\">\r\n  <component name=\"CheckStyle-IDEA-Module\">\r\n    <option name=\"configuration\">\r\n      <map />\r\n    </option>\r\n  </component>\r\n  <component name=\"NewModuleRootManager\" inherit-compiler-output=\"true\">\r\n    <exclude-output />\r\n    <content url=\"file://$MODULE_DIR$\">\r\n      <sourceFolder url=\"file://$MODULE_DIR$/src/test\" isTestSource=\"true\" />\r\n      <sourceFolder url=\"file://$MODULE_DIR$/src/main\" isTestSource=\"false\" />\r\n    </content>\r\n    <orderEntry type=\"inheritedJdk\" />\r\n    <orderEntry type=\"sourceFolder\" forTests=\"false\" />\r\n    <orderEntry type=\"module-library\" scope=\"TEST\">\r\n      <library name=\"JUnit5.4\">\r\n        <CLASSES>\r\n          <root url=\"jar://$MODULE_DIR$/lib/junit-jupiter-5.4.2.jar!/\" />\r\n          <root url=\"jar://$MODULE_DIR$/lib/junit-jupiter-api-5.4.2.jar!/\" />\r\n          <root url=\"jar://$MODULE_DIR$/lib/apiguardian-api-1.0.0.jar!/\" />\r\n          <root url=\"jar://$MODULE_DIR$/lib/opentest4j-1.1.1.jar!/\" />\r\n          <root url=\"jar://$MODULE_DIR$/lib/junit-platform-commons-1.4.2.jar!/\" />\r\n          <root url=\"jar://$MODULE_DIR$/lib/junit-jupiter-params-5.4.2.jar!/\" />\r\n          <root url=\"jar://$MODULE_DIR$/lib/junit-jupiter-engine-5.4.2.jar!/\" />\r\n          <root url=\"jar://$MODULE_DIR$/lib/junit-platform-engine-1.4.2.jar!/\" />\r\n        </CLASSES>\r\n        <JAVADOC />\r\n        <SOURCES />\r\n      </library>\r\n    </orderEntry>\r\n  </component>\r\n</module>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Project-Starter.iml b/Project-Starter.iml
+--- a/Project-Starter.iml	
++++ b/Project-Starter.iml	
+@@ -29,5 +29,6 @@
+         <SOURCES />
+       </library>
+     </orderEntry>
++    <orderEntry type="library" name="json-20200518" level="project" />
+   </component>
+ </module>
+\ No newline at end of file
+Index: data/planner.json
+===================================================================
+diff --git a/data/planner.json b/data/planner.json
+new file mode 100644
+--- /dev/null	
++++ b/data/planner.json	
+@@ -0,0 +1,39 @@
++{
++    "today": "28/07/2021",
++    "tasks": [
++        {
++            "dayOfWeek": "Wednesday",
++            "text": "task1",
++            "tagName": "tag1",
++            "dueIn": 3
++        },
++        {
++            "dayOfWeek": "Wednesday",
++            "text": "task2",
++            "tagName": "tag1",
++            "dueIn": 2
++        },
++        {
++            "dayOfWeek": "Thursday",
++            "text": "task4",
++            "tagName": "tag1",
++            "dueIn": 1
++        },
++        {
++            "dayOfWeek": "Thursday",
++            "text": "task5",
++            "tagName": "tag2",
++            "dueIn": 5
++        },
++        {
++            "dayOfWeek": "Friday",
++            "text": "task3",
++            "tagName": "tag2",
++            "dueIn": 3
++        }
++    ],
++    "tags": [
++        {"name": "tag1"},
++        {"name": "tag2"}
++    ]
++}
+\ No newline at end of file
+Index: .idea/libraries/json_20200518.xml
+===================================================================
+diff --git a/.idea/libraries/json_20200518.xml b/.idea/libraries/json_20200518.xml
+new file mode 100644
+--- /dev/null	
++++ b/.idea/libraries/json_20200518.xml	
+@@ -0,0 +1,9 @@
++<component name="libraryTable">
++  <library name="json-20200518">
++    <CLASSES>
++      <root url="jar://$PROJECT_DIR$/lib/json-20200518.jar!/" />
++    </CLASSES>
++    <JAVADOC />
++    <SOURCES />
++  </library>
++</component>
+\ No newline at end of file

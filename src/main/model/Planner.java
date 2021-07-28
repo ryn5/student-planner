@@ -9,15 +9,18 @@ import model.todospage.DueSoon;
 import model.todospage.AllTodoLists;
 import model.todospage.TodoList;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 // Represents a student planner with pages for to-do lists, tasks that are due soon, tags, and tasks grouped by tag
 public class Planner {
-    private static AllTodoLists todosPage;
-    private static DueSoon dueSoon;
-    private static TaskGroups groupsPage;
-    private static TagList tagsPage;
+    private AllTodoLists todosPage;
+    private DueSoon dueSoon;
+    private TaskGroups groupsPage;
+    private TagList tagsPage;
+    private Date currentDate;
 
     // EFFECTS: instantiates Planner with newly instantiated AllTodoLists, DueSoon, TaskGroups, and TagList, and sets
     //          current date as first day in TodosPage
@@ -27,32 +30,40 @@ public class Planner {
         dueSoon = new DueSoon();
         groupsPage = new TaskGroups();
         tagsPage = new TagList();
-
+        currentDate = Calendar.getInstance().getTime();
         setFirstDay();
     }
 
     // getters
-    public static AllTodoLists getTodosPage() {
+    public AllTodoLists getTodosPage() {
         return todosPage;
     }
 
-    public static DueSoon getDueSoon() {
+    public DueSoon getDueSoon() {
         return dueSoon;
     }
 
-    public static TaskGroups getGroupsPage() {
+    public TaskGroups getGroupsPage() {
         return groupsPage;
     }
 
-    public static TagList getTagsPage() {
+    public TagList getTagsPage() {
         return tagsPage;
     }
 
+    public Date getCurrentDate() {
+        return currentDate;
+    }
+
+//    // setter
+//    public void setCurrentDate(Date currentDate) {
+//        this.currentDate = currentDate;
+//    }
 
     // MODIFIES: this
     // EFFECTS: creates and adds new task to todosPage in TodoList with given dayOfWeek, groupsPage in TaskGroup with
     //          given tag, and dueSoon if given dueIn <= 2
-    public static void createTask(String tagName, int dueIn, String text, String dayOfWeek) {
+    public void createTask(String tagName, int dueIn, String text, String dayOfWeek) {
         Task newTask = new Task(getTagsPage().getTag(tagName), dueIn, text);
         todosPage.addTaskToCorrectDayOfWeek(newTask, dayOfWeek);
         groupsPage.addTaskToCorrectTaskGroup(newTask);
@@ -63,7 +74,7 @@ public class Planner {
 
     // MODIFIES: this
     // EFFECTS: removes given task from todosPage, dueSoon, and groupsPage
-    public static void deleteTask(Task task) {
+    public void deleteTask(Task task) {
         for (TodoList tl : todosPage.getAllTodoLists()) {
             tl.getTaskList().remove(task);
         }
@@ -75,7 +86,7 @@ public class Planner {
 
     // MODIFIES: this
     // EFFECTS: create new tag and add it to tagsPage, then create TaskGroup in groupsPage with new tag
-    public static void createTag(String name) throws TagAlreadyExistsException {
+    public void createTag(String name) throws TagAlreadyExistsException {
         tagsPage.addTag(name);
         groupsPage.addTaskGroup(tagsPage.getTag(name));
     }
@@ -83,7 +94,7 @@ public class Planner {
     // MODIFIES: this
     // EFFECTS: deletes all tasks in todosPage and dueSoon with given tag, then removes tag from tagsPage and
     //          removes TaskGroup with tag from groupsPage
-    public static void deleteTag(Tag tag) {
+    public void deleteTag(Tag tag) {
         if (tag != null) {
             for (TodoList tl : todosPage.getAllTodoLists()) {
                 tl.removeTask(tag);
@@ -96,19 +107,19 @@ public class Planner {
     }
 
     // EFFECTS: returns dayOfWeek in String format for given calendar
-    public static String getDayOfWeekForCalendar(Calendar c) {
+    public String getDayOfWeekForCalendar(Calendar c) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("EEEEE");
         return dateFormat.format(c.getTime());
     }
 
     // EFFECTS: returns dayOfWeek of first TodoList in TodosPage
-    public static String getFirstDay() {
+    public String getFirstDay() {
         return todosPage.getAllTodoLists().get(0).getDayOfWeek();
     }
 
     // MODIFIES: this
     // EFFECTS: cycles TodoLists in allTodoLists so that the first TodoList dayOfWeek matches today's dayOfWeek
-    public static void setFirstDay() {
+    public void setFirstDay() {
         Calendar c = Calendar.getInstance();
         while (!(getDayOfWeekForCalendar(c).equals(getFirstDay()))) {
             cycleTodoLists();
@@ -117,14 +128,14 @@ public class Planner {
 
     // MODIFIES: this
     // EFFECTS: removes oldest TodoList from TodosPage and adds new one to the end with same dayOfWeek
-    public static void cycleTodoLists() {
+    public void cycleTodoLists() {
         todosPage.addTodoList(todosPage.getAllTodoLists().get(0).getDayOfWeek());
         todosPage.getAllTodoLists().remove(0);
     }
 
     // MODIFIES: this
     // EFFECTS: subtracts 1 day from all due dates in planner
-    public static void updateDueDates() {
+    public void updateDueDates() {
         for (TaskGroup tg : groupsPage.getTaskGroups()) {
             tg.updateDueDates();
         }
@@ -132,7 +143,7 @@ public class Planner {
 
     // MODIFIES: this
     // EFFECTS: removes all tasks with dueIn < 0 from planner
-    public static void clearOverdueTasks() {
+    public void clearOverdueTasks() {
         for (TodoList tl : todosPage.getAllTodoLists()) {
             tl.clearOverdue();
         }
@@ -142,7 +153,7 @@ public class Planner {
 
     // MODIFIES: this
     // EFFECTS: adds all tasks with dueIn == 2 to DueSoon
-    public static void addNewDueSoon() {
+    public void addNewDueSoon() {
         for (TaskGroup tg : groupsPage.getTaskGroups()) {
             for (Task t : tg.getTaskList()) {
                 if (t.getDueIn() == 2) {
@@ -154,11 +165,24 @@ public class Planner {
 
     // MODIFIES: this
     // EFFECTS: cycles TodoLists in TodosPage, subtracts 1 from all due dates, and then removes overdue tasks
-    public static void updateDay() {
+    public void updateDay() {
         cycleTodoLists();
         updateDueDates();
         clearOverdueTasks();
         addNewDueSoon();
+        updateCurrentDate();
+    }
+
+    private void updateCurrentDate() {
+        Calendar c = Calendar.getInstance();
+        c.setTime(currentDate);
+        c.add(Calendar.DAY_OF_MONTH, 1);
+        currentDate = c.getTime();
+    }
+
+    public String formatDate(Date date) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        return simpleDateFormat.format(date);
     }
 
 
