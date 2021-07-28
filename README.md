@@ -30,4 +30,5 @@ dedicated application that I can use to keep track of everything I need to do ea
 - As a user, I want to be able to delete a tag
 - As a user, I want to be able to view my created tags
 - As a user, I want to be able to view a work-list of my tasks grouped by tag
-
+- As a user, I want to be able to save my todo-lists and tags to file
+- As a user, I want to be able to load my todo-lists and tags from file
