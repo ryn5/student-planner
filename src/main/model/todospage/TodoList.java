@@ -4,7 +4,7 @@ import model.TaskList;
 
 // Represents a list of tasks associated with a day of the week
 public class TodoList extends TaskList {
-    String dayOfWeek;
+    private String dayOfWeek;
 
     // EFFECTS: instantiates new TaskList and sets dayOfWeek
     public TodoList(String dayOfWeek) {

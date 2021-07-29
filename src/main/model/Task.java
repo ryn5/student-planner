@@ -1,6 +1,7 @@
 package model;
 
 import model.tagspage.Tag;
+import org.json.JSONObject;
 
 // Represents a task with a tag, number of days until its due date, and a description
 public class Task {
@@ -31,5 +32,16 @@ public class Task {
     // setters
     public void setDueIn(int dueIn) {
         this.dueIn = dueIn;
+    }
+
+    public JSONObject toJson(String dayOfWeek) {
+        JSONObject jsonTask = new JSONObject();
+
+        jsonTask.put("tagName", tag.getName());
+        jsonTask.put("dueIn", dueIn);
+        jsonTask.put("text", text);
+        jsonTask.put("dayOfWeek", dayOfWeek);
+
+        return jsonTask;
     }
 }

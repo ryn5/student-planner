@@ -8,8 +8,11 @@ import model.tagspage.TagList;
 import model.todospage.DueSoon;
 import model.todospage.AllTodoLists;
 import model.todospage.TodoList;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -55,10 +58,10 @@ public class Planner {
         return currentDate;
     }
 
-//    // setter
-//    public void setCurrentDate(Date currentDate) {
-//        this.currentDate = currentDate;
-//    }
+    // setter
+    public void setCurrentDate(Date currentDate) {
+        this.currentDate = currentDate;
+    }
 
     // MODIFIES: this
     // EFFECTS: creates and adds new task to todosPage in TodoList with given dayOfWeek, groupsPage in TaskGroup with
@@ -173,6 +176,8 @@ public class Planner {
         updateCurrentDate();
     }
 
+    // MODIFIES: this
+    // EFFECTS: updates currentDate by 1 day
     private void updateCurrentDate() {
         Calendar c = Calendar.getInstance();
         c.setTime(currentDate);
@@ -180,10 +185,52 @@ public class Planner {
         currentDate = c.getTime();
     }
 
+    // EFFECTS: returns date as a formatted string
     public String formatDate(Date date) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
         return simpleDateFormat.format(date);
     }
 
+    // EFFECTS: returns date from a formatted string
+    public Date parseDate(String formattedDate) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        try {
+            return simpleDateFormat.parse(formattedDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    public JSONObject toJson() {
+        JSONObject jsonPlanner = new JSONObject();
+
+        jsonPlanner.put("currentDate", currentDate);
+        jsonPlanner.put("tags", tagsToJson());
+        jsonPlanner.put("tasks", tasksToJson());
+
+        return jsonPlanner;
+    }
+
+    private JSONArray tagsToJson() {
+        JSONArray tagsJson = new JSONArray();
+
+        for (Tag t : tagsPage.getTagList()) {
+            tagsJson.put(t.toJson());
+        }
+        return tagsJson;
+    }
+
+    private JSONArray tasksToJson() {
+        JSONArray tasksJson = new JSONArray();
+
+        for (TodoList tl : getTodosPage().getAllTodoLists()) {
+            for (Task t : tl.getTaskList()) {
+                tasksJson.put(t.toJson(tl.getDayOfWeek()));
+            }
+        }
+        return tasksJson;
+    }
 
 }

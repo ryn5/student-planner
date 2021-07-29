@@ -1,5 +1,7 @@
 package model.tagspage;
 
+import org.json.JSONObject;
+
 // A tag that can be attached to tasks
 public class Tag {
     private final String name;
@@ -12,5 +14,11 @@ public class Tag {
     // getter
     public String getName() {
         return name;
+    }
+
+    public JSONObject toJson() {
+        JSONObject jsonTag = new JSONObject();
+        jsonTag.put("name", name);
+        return jsonTag;
     }
 }
