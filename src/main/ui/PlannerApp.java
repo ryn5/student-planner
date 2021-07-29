@@ -71,8 +71,8 @@ public class PlannerApp {
         System.out.println("\ttodos -> Todos Page");
         System.out.println("\tgroups -> Groups Page");
         System.out.println("\ttags -> Tags Page");
-        System.out.println("\tsave -> Tags Page");
-        System.out.println("\tload -> Tags Page");
+        System.out.println("\tsave -> Save Planner");
+        System.out.println("\tload -> Load Planner");
         System.out.println("\tquit -> Quit");
     }
 
@@ -91,8 +91,10 @@ public class PlannerApp {
                 break;
             case "save":
                 savePlanner();
+                break;
             case "load":
                 loadPlanner();
+                break;
             default:
                 System.out.println("Invalid input.  Please try again.");
                 break;
@@ -151,7 +153,7 @@ public class PlannerApp {
 
         String newTaskTag = input.next();
         int newTaskDueIn = Integer.parseInt(input.next());
-        String newTaskText = input.next();
+        String newTaskText = input.nextLine();
 
         planner.createTask(newTaskTag, newTaskDueIn, newTaskText,
                 planner.getTodosPage().getAllTodoLists().get(currentIndex).getDayOfWeek());
@@ -224,9 +226,9 @@ public class PlannerApp {
             for (Task t : tg.getTaskList()) {
                 String printStatement = "\t" + t.getText() + " (due in " + t.getDueIn() + " days)";
                 System.out.println(printStatement);
-                emptyLine();
             }
         }
+        emptyLine();
         System.out.println("Enter \"back\" for menu.");
         processGroupsCommand(input.next());
     }
@@ -246,10 +248,9 @@ public class PlannerApp {
     // EFFECTS: displays tags and takes user input
     private void runTagsPage() {
         System.out.println("Tags: ");
-        emptyLine();
 
         for (Tag t : planner.getTagsPage().getTagList()) {
-            System.out.println(t.getName());
+            System.out.println("\t" + t.getName());
         }
         emptyLine();
 
@@ -310,7 +311,7 @@ public class PlannerApp {
     // EFFECTS: loads workroom from file
     private void loadPlanner() {
         try {
-            jsonReader.read();
+            planner = jsonReader.read();
             System.out.println("Successfully loaded Planner from " + JSON_STORE);
         } catch (IOException e) {
             System.out.println("Couldn't read from file: " + JSON_STORE);

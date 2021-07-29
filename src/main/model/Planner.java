@@ -207,7 +207,7 @@ public class Planner {
     public JSONObject toJson() {
         JSONObject jsonPlanner = new JSONObject();
 
-        jsonPlanner.put("currentDate", currentDate);
+        jsonPlanner.put("currentDate", formatDate(currentDate));
         jsonPlanner.put("tags", tagsToJson());
         jsonPlanner.put("tasks", tasksToJson());
 

@@ -29,7 +29,7 @@ public class JsonWriter {
     // EFFECTS: writes and saves JSON representation of planner to file
     public void write(Planner planner) {
         JSONObject jsonPlanner = planner.toJson();
-        saveToFile(jsonPlanner.toString());
+        saveToFile(jsonPlanner.toString(4));
     }
 
     // MODIFIES: this

@@ -1,0 +1,33 @@
+{
+    "currentDate": "28/07/2021",
+    "tasks": [
+        {
+            "dayOfWeek": "Wednesday",
+            "text": "text",
+            "tagName": "t1",
+            "dueIn": 3
+        },
+        {
+            "dayOfWeek": "Wednesday",
+            "text": "text",
+            "tagName": "t2",
+            "dueIn": 2
+        },
+        {
+            "dayOfWeek": "Thursday",
+            "text": "thurs",
+            "tagName": "t1",
+            "dueIn": 2
+        },
+        {
+            "dayOfWeek": "Friday",
+            "text": "friday",
+            "tagName": "t2",
+            "dueIn": 4
+        }
+    ],
+    "tags": [
+        {"name": "t1"},
+        {"name": "t2"}
+    ]
+}
