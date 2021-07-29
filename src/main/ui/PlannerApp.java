@@ -167,8 +167,13 @@ public class PlannerApp {
         System.out.println("Enter number of task to be deleted: ");
 
         int taskNumber = Integer.parseInt(input.next());
-        planner.deleteTask(planner.getTodosPage().getAllTodoLists().get(currentIndex).getTask(taskNumber - 1));
+        TodoList todoList = planner.getTodosPage().getAllTodoLists().get(currentIndex);
 
+        if (taskNumber > todoList.getTaskList().size()) {
+            System.out.println("Task not found; please try again.");
+        } else {
+            planner.deleteTask(todoList.getTask(taskNumber - 1));
+        }
         runTodosPage(currentIndex);
     }
 
