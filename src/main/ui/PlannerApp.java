@@ -7,7 +7,11 @@ import model.TaskList;
 import model.groupspage.TaskGroup;
 import model.tagspage.Tag;
 import model.todospage.TodoList;
+import persistence.JsonReader;
+import persistence.JsonWriter;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Scanner;
@@ -20,6 +24,9 @@ public class PlannerApp {
     private Scanner input;
     private boolean running;
     private Date today;
+    private JsonWriter jsonWriter;
+    private JsonReader jsonReader;
+    private static final String JSON_STORE = "./data/planner.json";
 
     // EFFECTS: instantiates Planner and runs the application
     public PlannerApp() {
@@ -52,8 +59,10 @@ public class PlannerApp {
     private void init() {
         planner = new Planner();
         input = new Scanner(System.in);
-        today = Calendar.getInstance().getTime();
         running = true;
+        today = Calendar.getInstance().getTime();
+        jsonWriter = new JsonWriter(JSON_STORE);
+        jsonReader = new JsonReader(JSON_STORE);
     }
 
     // EFFECTS: displays main menu
@@ -80,6 +89,10 @@ public class PlannerApp {
             case "tags":
                 runTagsPage();
                 break;
+            case "save":
+                savePlanner();
+            case "load":
+                loadPlanner();
             default:
                 System.out.println("Invalid input.  Please try again.");
                 break;
@@ -278,6 +291,29 @@ public class PlannerApp {
             System.out.println("Tag with name already exists.");
         } finally {
             runTagsPage();
+        }
+    }
+
+    // EFFECTS: saves planner to file
+    private void savePlanner() {
+        try {
+            jsonWriter.open();
+            jsonWriter.write(planner);
+            jsonWriter.close();
+            System.out.println("Successfully saved Planner to" + JSON_STORE);
+        } catch (FileNotFoundException e) {
+            System.out.println("Couldn't write to file: " + JSON_STORE);
+        }
+    }
+
+    // MODIFIES: this, Planner
+    // EFFECTS: loads workroom from file
+    private void loadPlanner() {
+        try {
+            jsonReader.read();
+            System.out.println("Successfully loaded Planner from " + JSON_STORE);
+        } catch (IOException e) {
+            System.out.println("Couldn't read from file: " + JSON_STORE);
         }
     }
 

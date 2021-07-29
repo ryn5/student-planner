@@ -34,6 +34,7 @@ public class Task {
         this.dueIn = dueIn;
     }
 
+    // EFFECTS: creates JSON representation of task
     public JSONObject toJson(String dayOfWeek) {
         JSONObject jsonTask = new JSONObject();
 

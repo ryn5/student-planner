@@ -16,6 +16,7 @@ public class Tag {
         return name;
     }
 
+    // EFFECTS: creates JSON representation of tag
     public JSONObject toJson() {
         JSONObject jsonTag = new JSONObject();
         jsonTag.put("name", name);

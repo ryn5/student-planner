@@ -11,6 +11,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 
+// Represent a reader that reads planner state from JSON data stored in file
+// ATTRIBUTIONS: class was modeled after the JsonReader in the following WorkRoomApp:
+//               https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo
 public class JsonReader {
     private String source;
 

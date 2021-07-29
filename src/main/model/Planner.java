@@ -203,6 +203,7 @@ public class Planner {
     }
 
 
+    // EFFECTS: creates JSON representation of planner state
     public JSONObject toJson() {
         JSONObject jsonPlanner = new JSONObject();
 
@@ -213,6 +214,7 @@ public class Planner {
         return jsonPlanner;
     }
 
+    // EFFECTS: creates JSON representation of all tags in planner
     private JSONArray tagsToJson() {
         JSONArray tagsJson = new JSONArray();
 
@@ -222,6 +224,7 @@ public class Planner {
         return tagsJson;
     }
 
+    // EFFECTS: creates JSON representation of all tasks in planner
     private JSONArray tasksToJson() {
         JSONArray tasksJson = new JSONArray();
 

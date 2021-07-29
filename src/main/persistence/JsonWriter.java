@@ -7,6 +7,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 
+// Represent a writer that writes JSON representation of planner state to file
+// ATTRIBUTIONS: class was modeled after the JsonReader in the following WorkRoomApp:
+//               https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo
 public class JsonWriter {
     private PrintWriter writer;
     private String destination;
