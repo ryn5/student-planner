@@ -197,7 +197,7 @@ public class Planner {
         try {
             return simpleDateFormat.parse(formattedDate);
         } catch (ParseException e) {
-            e.printStackTrace();
+            System.out.println("Date could not be parsed");
         }
         return null;
     }

@@ -4,6 +4,7 @@ import exceptions.TagAlreadyExistsException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.text.ParseException;
 import java.util.Calendar;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -18,6 +19,11 @@ public class PlannerTest {
         today = Calendar.getInstance();
         tomorrow = Calendar.getInstance();
         tomorrow.add(Calendar.DAY_OF_YEAR, 1);
+    }
+
+    @Test
+    void testGetCurrentDate() {
+        assertEquals(planner.formatDate(Calendar.getInstance().getTime()), planner.formatDate(planner.getCurrentDate()));
     }
 
     @Test
@@ -134,6 +140,12 @@ public class PlannerTest {
                 getTodoList(planner.getDayOfWeekForCalendar(tomorrow)).getTaskList().size());
         assertEquals(1, planner.getDueSoon().getTaskList().size());
         assertEquals(1, planner.getGroupsPage().getTaskGroups().get(0).getTaskList().size());
-
     }
+
+    @Test
+    void testParseDateParseError() {
+        assertNull(planner.parseDate("not a date"));
+    }
+
+
 }

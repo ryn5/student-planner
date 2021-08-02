@@ -1,0 +1,21 @@
+{
+    "currentDate": "02/08/2021",
+    "tasks": [
+        {
+            "dayOfWeek": "Monday",
+            "text": "task1",
+            "tagName": "tag1",
+            "dueIn": 2
+        },
+        {
+            "dayOfWeek": "Tuesday",
+            "text": "task2",
+            "tagName": "tag2",
+            "dueIn": 3
+        }
+    ],
+    "tags": [
+        {"name": "tag1"},
+        {"name": "tag2"}
+    ]
+}

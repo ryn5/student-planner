@@ -23,7 +23,7 @@ public class JsonReader {
     }
 
     // EFFECTS: reads source file and returns planner
-    public Planner read() throws IOException {
+    public Planner read() throws IOException, TagAlreadyExistsException {
         String jsonData = readFile();                     // file -> String
         JSONObject jsonObject = new JSONObject(jsonData); // String -> json
         return parsePlanner(jsonObject);                  // json -> planner
@@ -41,7 +41,7 @@ public class JsonReader {
     }
 
     // EFFECTS: parses planner from JSON object and returns it
-    private Planner parsePlanner(JSONObject jsonObject) {
+    private Planner parsePlanner(JSONObject jsonObject) throws TagAlreadyExistsException {
         Planner planner = new Planner();
 
         Date savedDate = planner.parseDate(jsonObject.getString("currentDate"));
@@ -55,17 +55,13 @@ public class JsonReader {
 
 
     // EFFECTS: parses tags from JSON objects and creates them in planner
-    private void loadTags(Planner planner, JSONObject jsonObject) {
+    private void loadTags(Planner planner, JSONObject jsonObject) throws TagAlreadyExistsException {
         JSONArray jsonArray = jsonObject.getJSONArray("tags");
         for (Object json : jsonArray) {
             JSONObject jsonTag = (JSONObject) json;
             String name = jsonTag.getString("name");
 
-            try {
-                planner.createTag(name);
-            } catch (TagAlreadyExistsException e) {
-                e.printStackTrace();
-            }
+            planner.createTag(name);
         }
     }
 

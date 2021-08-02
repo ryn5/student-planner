@@ -320,6 +320,8 @@ public class PlannerApp {
             System.out.println("Successfully loaded Planner from " + JSON_STORE);
         } catch (IOException e) {
             System.out.println("Couldn't read from file: " + JSON_STORE);
+        } catch (TagAlreadyExistsException e) {
+            System.out.println("Loaded duplicate tag");
         }
     }
 
