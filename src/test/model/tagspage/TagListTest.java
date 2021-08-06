@@ -1,6 +1,7 @@
 package model.tagspage;
 
 import exceptions.TagAlreadyExistsException;
+import exceptions.TagNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -51,14 +52,14 @@ public class TagListTest {
     }
 
     @Test
-    void testGetTag() throws TagAlreadyExistsException {
+    void testGetTag() throws TagAlreadyExistsException, TagNotFoundException {
         tagList.addTag("Tag 1");
         tagList.addTag("Tag 2");
         assertEquals("Tag 2", tagList.getTag("Tag 2").getName());
     }
 
     @Test
-    void testGetTagNull() {
+    void testGetTagNull() throws TagNotFoundException {
         assertNull(tagList.getTag("Tag 1"));
     }
 }

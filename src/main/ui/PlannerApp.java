@@ -1,6 +1,7 @@
 package ui;
 
 import exceptions.TagAlreadyExistsException;
+import exceptions.TagNotFoundException;
 import model.Planner;
 import model.Task;
 import model.TaskList;
@@ -277,7 +278,11 @@ public class PlannerApp {
                 break;
             case "del":
                 System.out.println("Enter name of tag to be deleted: ");
-                planner.deleteTag(planner.getTagsPage().getTag(input.next()));
+                try {
+                    planner.deleteTag(planner.getTagsPage().getTag(input.next()));
+                } catch (TagNotFoundException ignored) {
+                    ;
+                }
                 runTagsPage();
                 break;
             case "back":

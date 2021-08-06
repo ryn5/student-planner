@@ -1,6 +1,7 @@
 package model;
 
 import exceptions.TagAlreadyExistsException;
+import exceptions.TagNotFoundException;
 import model.groupspage.TaskGroup;
 import model.groupspage.TaskGroups;
 import model.tagspage.Tag;
@@ -67,11 +68,15 @@ public class Planner {
     // EFFECTS: creates and adds new task to todosPage in TodoList with given dayOfWeek, groupsPage in TaskGroup with
     //          given tag, and dueSoon if given dueIn <= 2
     public void createTask(String tagName, int dueIn, String text, String dayOfWeek) {
-        Task newTask = new Task(getTagsPage().getTag(tagName), dueIn, text);
-        todosPage.addTaskToCorrectDayOfWeek(newTask, dayOfWeek);
-        groupsPage.addTaskToCorrectTaskGroup(newTask);
-        if (dueIn <= 2) {
-            dueSoon.getTaskList().add(newTask);
+        try {
+            Task newTask = new Task(getTagsPage().getTag(tagName), dueIn, text);
+            todosPage.addTaskToCorrectDayOfWeek(newTask, dayOfWeek);
+            groupsPage.addTaskToCorrectTaskGroup(newTask);
+            if (dueIn <= 2) {
+                dueSoon.getTaskList().add(newTask);
+            }
+        } catch (TagNotFoundException ignored) {
+            ;
         }
     }
 
@@ -91,7 +96,11 @@ public class Planner {
     // EFFECTS: create new tag and add it to tagsPage, then create TaskGroup in groupsPage with new tag
     public void createTag(String name) throws TagAlreadyExistsException {
         tagsPage.addTag(name);
-        groupsPage.addTaskGroup(tagsPage.getTag(name));
+        try {
+            groupsPage.addTaskGroup(tagsPage.getTag(name));
+        } catch (TagNotFoundException ignored) {
+            ;
+        }
     }
 
     // MODIFIES: this

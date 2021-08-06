@@ -1,6 +1,7 @@
 package model.tagspage;
 
 import exceptions.TagAlreadyExistsException;
+import exceptions.TagNotFoundException;
 import model.Planner;
 
 import java.util.ArrayList;
@@ -21,13 +22,13 @@ public class TagList {
     }
 
     // EFFECTS: returns tag with given name
-    public Tag getTag(String tagName) {
+    public Tag getTag(String tagName) throws TagNotFoundException {
         for (Tag t : tagList) {
             if (tagName.equals(t.getName())) {
                 return t;
             }
         }
-        return null;
+        throw new TagNotFoundException();
     }
 
     // MODIFIES: this

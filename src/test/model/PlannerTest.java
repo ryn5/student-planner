@@ -1,6 +1,7 @@
 package model;
 
 import exceptions.TagAlreadyExistsException;
+import exceptions.TagNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +36,7 @@ public class PlannerTest {
     }
 
     @Test
-    void testDeleteTag() throws TagAlreadyExistsException {
+    void testDeleteTag() throws TagAlreadyExistsException, TagNotFoundException {
         planner.createTag("Tag");
         planner.createTask("Tag", 2, "task1", "Tuesday");
         planner.createTask("Tag", 3, "task2", "Tuesday");
@@ -47,7 +48,7 @@ public class PlannerTest {
     }
 
     @Test
-    void testDeleteTagNotFound() throws TagAlreadyExistsException {
+    void testDeleteTagNotFound() throws TagAlreadyExistsException, TagNotFoundException {
         planner.createTag("Tag");
         planner.createTask("Tag", 2, "task1", "Tuesday");
         planner.createTask("Tag", 3, "task2", "Tuesday");
