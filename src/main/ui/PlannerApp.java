@@ -149,7 +149,8 @@ public class PlannerApp {
     // MODIFIES: this, Planner
     // EFFECTS: creates new task in current to-do list and rest of Planner
     private void processAddTask(int currentIndex) {
-        System.out.println("Enter new task tag, number of days until due date, and a description, separately: ");
+        System.out.println("Enter details in the following format excluding parentheses: "
+                + "[tag] [days due in] [description].");
 
         String newTaskTag = input.next();
         int newTaskDueIn = Integer.parseInt(input.next());

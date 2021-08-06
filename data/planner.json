@@ -1,29 +1,17 @@
 {
-    "currentDate": "28/07/2021",
+    "currentDate": "04/08/2021",
     "tasks": [
         {
             "dayOfWeek": "Wednesday",
-            "text": "text",
+            "text": "task1",
             "tagName": "t1",
-            "dueIn": 3
+            "dueIn": 2
         },
         {
             "dayOfWeek": "Wednesday",
-            "text": "text",
-            "tagName": "t2",
-            "dueIn": 2
-        },
-        {
-            "dayOfWeek": "Thursday",
-            "text": "thurs",
+            "text": "task2",
             "tagName": "t1",
-            "dueIn": 2
-        },
-        {
-            "dayOfWeek": "Friday",
-            "text": "friday",
-            "tagName": "t2",
-            "dueIn": 4
+            "dueIn": 1
         }
     ],
     "tags": [
