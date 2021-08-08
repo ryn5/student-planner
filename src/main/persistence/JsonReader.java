@@ -56,7 +56,8 @@ public class JsonReader {
 
 
     // EFFECTS: parses tags from JSON objects and creates them in planner
-    private void loadTags(Planner planner, JSONObject jsonObject) throws TagAlreadyExistsException, TagNotFoundException {
+    private void loadTags(Planner planner, JSONObject jsonObject) throws TagAlreadyExistsException,
+            TagNotFoundException {
         JSONArray jsonArray = jsonObject.getJSONArray("tags");
         for (Object json : jsonArray) {
             JSONObject jsonTag = (JSONObject) json;
