@@ -21,6 +21,7 @@ public class TodosEvents {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            GUI.playSound(GUI.BUTTON_PRESS_SOUND);
             gui.setCurrentIndex(newIndex);
             gui.getPanelContainer().remove(1);
             gui.getPanelContainer().add(gui.initTodosPanel(), "Todos", 1);
@@ -46,6 +47,7 @@ public class TodosEvents {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            GUI.playSound(GUI.BUTTON_PRESS_SOUND);
             String dayOfWeek = gui.getPlanner().getTodosPage().getAllTodoLists().get(currentIndex).getDayOfWeek();
             try {
                 gui.getPlanner().createTask(newTagField.getText(), Integer.parseInt(newDueInField.getText()),
@@ -72,6 +74,7 @@ public class TodosEvents {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            GUI.playSound(GUI.BUTTON_PRESS_SOUND);
             int taskIndex = gui.getTaskList().getSelectedIndex();
 
             gui.getPlanner().deleteTask(gui.getPlanner().getTodosPage().getAllTodoLists().get(currentIndex)

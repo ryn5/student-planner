@@ -11,8 +11,12 @@ import ui.events.MenuEvents;
 import ui.events.TagsEvents;
 import ui.events.TodosEvents;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -20,6 +24,7 @@ public class GUI extends JFrame {
     private static final int WIDTH = 400;
     private static final int HEIGHT = 620;
     private static final int BAR_HEIGHT = 40;
+
     private Planner planner;
     private JTabbedPane panelContainer;
     private JList<String> taskList;
@@ -33,6 +38,7 @@ public class GUI extends JFrame {
     private JsonWriter jsonWriter;
     private JsonReader jsonReader;
     private static final String JSON_STORE = "./data/planner.json";
+    public static final String BUTTON_PRESS_SOUND = "./data/buttonPress.wav";
 
     // getters
     public Planner getPlanner() {
@@ -393,6 +399,19 @@ public class GUI extends JFrame {
         tagsDLM.clear();
         for (Tag t : planner.getTagsPage().getTagList()) {
             tagsDLM.addElement(t.getName());
+        }
+    }
+
+    // method was sourced from http://suavesnippets.blogspot.com/2011/06/add-sound-on-jbutton-click-in-java.html
+    public static void playSound(String soundFile) {
+        try {
+            AudioInputStream audioInputStream = AudioSystem
+                    .getAudioInputStream(new File(soundFile).getAbsoluteFile());
+            Clip clip = AudioSystem.getClip();
+            clip.open(audioInputStream);
+            clip.start();
+        } catch (Exception e) {
+            System.out.println("Error with playing sound.");
         }
     }
 

@@ -22,6 +22,7 @@ public class MenuEvents {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            GUI.playSound(GUI.BUTTON_PRESS_SOUND);
             panelContainer.setSelectedIndex(index);
         }
 
@@ -36,6 +37,7 @@ public class MenuEvents {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            GUI.playSound(GUI.BUTTON_PRESS_SOUND);
             try {
                 gui.getJsonWriter().open();
                 gui.getJsonWriter().write(gui.getPlanner());
@@ -57,6 +59,7 @@ public class MenuEvents {
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
+                GUI.playSound(GUI.BUTTON_PRESS_SOUND);
                 gui.setPlanner(gui.getJsonReader().read());
                 gui.checkUpdate();
                 gui.refreshTodosPanel();

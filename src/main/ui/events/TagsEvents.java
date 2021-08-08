@@ -23,6 +23,7 @@ public class TagsEvents {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            GUI.playSound(GUI.BUTTON_PRESS_SOUND);
             try {
                 gui.getPlanner().createTag(newNameField.getText());
                 gui.getTagsDLM().addElement(newNameField.getText());
@@ -42,6 +43,7 @@ public class TagsEvents {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            GUI.playSound(GUI.BUTTON_PRESS_SOUND);
             try {
                 gui.getPlanner().deleteTag(gui.getPlanner().getTagsPage().getTag(gui.getTagList().getSelectedValue()));
                 gui.getTagsDLM().removeElement(gui.getTagList().getSelectedValue());
