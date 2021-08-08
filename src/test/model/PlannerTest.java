@@ -65,6 +65,19 @@ public class PlannerTest {
     }
 
     @Test
+    void testDeleteTagNull() throws TagAlreadyExistsException, TagNotFoundException {
+        planner.createTag("Tag");
+        planner.createTask("Tag", 2, "task1", "Tuesday");
+        planner.createTask("Tag", 3, "task2", "Tuesday");
+
+        planner.deleteTag(null);
+
+        assertEquals(2, planner.getTodosPage().getTodoList("Tuesday").getTaskList().size());
+        assertEquals(1, planner.getDueSoon().getTaskList().size());
+        assertEquals(1, planner.getGroupsPage().getTaskGroups().size());
+    }
+
+    @Test
     void testCreateTask() throws TagAlreadyExistsException, TagNotFoundException {
         planner.createTag("Tag");
 
@@ -86,7 +99,6 @@ public class PlannerTest {
         assertEquals(0, planner.getTodosPage().getTodoList("Tuesday").getTaskList().size());
         assertEquals(0, planner.getDueSoon().getTaskList().size());
         assertEquals(0, planner.getGroupsPage().getTaskGroups().get(0).getTaskList().size());
-
     }
 
     @Test
