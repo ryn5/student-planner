@@ -1,6 +1,7 @@
 package persistence;
 
 import exceptions.TagAlreadyExistsException;
+import exceptions.TagNotFoundException;
 import model.Planner;
 import model.tagspage.Tag;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,8 @@ public class JsonReaderTest {
             fail();
         } catch (IOException e) {
         } catch (TagAlreadyExistsException e) {
+            fail();
+        } catch (TagNotFoundException e) {
             fail();
         }
     }

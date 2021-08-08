@@ -5,30 +5,96 @@ import model.Task;
 import model.groupspage.TaskGroup;
 import model.tagspage.Tag;
 import model.todospage.TodoList;
+import persistence.JsonReader;
+import persistence.JsonWriter;
 import ui.events.MenuEvents;
 import ui.events.TagsEvents;
 import ui.events.TodosEvents;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Calendar;
+import java.util.Date;
 
 public class GUI extends JFrame {
     private static final int WIDTH = 400;
     private static final int HEIGHT = 620;
     private static final int BAR_HEIGHT = 40;
-
     private Planner planner;
     private JTabbedPane panelContainer;
     private JList<String> taskList;
     private JList<String> tagList;
     private DefaultListModel<String> tasksDLM;
     private DefaultListModel<String> tagsDLM;
+    private int currentIndex;
+    private JLabel dueSoonLabel;
+    private JLabel groupsLabel;
+
+    private JsonWriter jsonWriter;
+    private JsonReader jsonReader;
+    private static final String JSON_STORE = "./data/planner.json";
+
+    // getters
+    public Planner getPlanner() {
+        return planner;
+    }
+
+    public JTabbedPane getPanelContainer() {
+        return panelContainer;
+    }
+
+    public JList<String> getTaskList() {
+        return taskList;
+    }
+
+    public JList<String> getTagList() {
+        return tagList;
+    }
+
+    public DefaultListModel<String> getTasksDLM() {
+        return tasksDLM;
+    }
+
+    public DefaultListModel<String> getTagsDLM() {
+        return tagsDLM;
+    }
+
+    public JsonWriter getJsonWriter() {
+        return jsonWriter;
+    }
+
+    public JsonReader getJsonReader() {
+        return jsonReader;
+    }
+
+    public String getJsonStore() {
+        return JSON_STORE;
+    }
+
+    // setters
+    public void setPlanner(Planner planner) {
+        this.planner = planner;
+    }
+
+    public void setCurrentIndex(int currentIndex) {
+        this.currentIndex = currentIndex;
+    }
 
     public GUI() {
         planner = new Planner();
+        jsonWriter = new JsonWriter(JSON_STORE);
+        jsonReader = new JsonReader(JSON_STORE);
+        checkUpdate();
         setupFrame();
         initPanels();
         setVisible(true);
+    }
+
+    public void checkUpdate() {
+        Date today = Calendar.getInstance().getTime();
+        while (!planner.formatDate(planner.getCurrentDate()).equals(planner.formatDate(today))) {
+            planner.updateDay();
+        }
     }
 
     private void setupFrame() {
@@ -40,9 +106,11 @@ public class GUI extends JFrame {
 
     public void initPanels() {
         panelContainer = new JTabbedPane();
+        currentIndex = 0;
+        groupsLabel = new JLabel(); // initialize for actionListener
 
         panelContainer.add(initMenuPanel(), "Menu");
-        panelContainer.add(initTodosPanel(0), "Todos");
+        panelContainer.add(initTodosPanel(), "Todos");
         panelContainer.add(initGroupsPanel(), "Groups");
         panelContainer.add(initTagsPanel(), "Tags");
 
@@ -80,8 +148,8 @@ public class GUI extends JFrame {
         todosButton.addActionListener(new MenuEvents.TabEvent(panelContainer, 1));
         groupsButton.addActionListener(new MenuEvents.TabEvent(panelContainer, 2));
         tagsButton.addActionListener(new MenuEvents.TabEvent(panelContainer, 3));
-        saveButton.addActionListener(new MenuEvents.SaveEvent(planner));
-        loadButton.addActionListener(new MenuEvents.LoadEvent(planner));
+        saveButton.addActionListener(new MenuEvents.SaveEvent(this));
+        loadButton.addActionListener(new MenuEvents.LoadEvent(this));
 
         todosButton.setPreferredSize(new Dimension(250, 70));
         groupsButton.setPreferredSize(new Dimension(250, 70));
@@ -98,20 +166,25 @@ public class GUI extends JFrame {
         return menuButtonsPanel;
     }
 
-    public JPanel initTodosPanel(int currentIndex) {
+    public JPanel initTodosPanel() {
         JPanel todosPanel = new JPanel();
         todosPanel.setLayout(new BoxLayout(todosPanel, BoxLayout.Y_AXIS));
         todosPanel.setBackground(Color.black);
 
-        todosPanel.add(initTodosTopBar(currentIndex));
-        todosPanel.add(initTodoList(currentIndex));
+        todosPanel.add(initTodosTopBar());
+        todosPanel.add(initTodoList());
         todosPanel.add(initDueSoon());
-        todosPanel.add(initTodosBotBar(currentIndex));
+        todosPanel.add(initTodosBotBar());
 
         return todosPanel;
     }
 
-    private JPanel initTodosTopBar(int currentIndex) {
+    public void refreshTodosPanel() {
+        panelContainer.remove(1);
+        panelContainer.add(initTodosPanel(), "Todos", 1);
+    }
+
+    private JPanel initTodosTopBar() {
         JPanel todosTopBar = new JPanel(new FlowLayout());
         todosTopBar.setBackground(Color.green);
         todosTopBar.setPreferredSize(new Dimension(WIDTH, BAR_HEIGHT));
@@ -124,10 +197,10 @@ public class GUI extends JFrame {
         todosTopBar.add(dayLabel);
         todosTopBar.add(nextListButton);
 
-        prevListButton.addActionListener(new TodosEvents.ScrollListEvent(panelContainer,
-                processScrollList(currentIndex, "prev"), this));
-        nextListButton.addActionListener(new TodosEvents.ScrollListEvent(panelContainer,
-                processScrollList(currentIndex, "next"), this));
+        prevListButton.addActionListener(new TodosEvents.ScrollListEvent(processScrollList(currentIndex, "prev"),
+                this));
+        nextListButton.addActionListener(new TodosEvents.ScrollListEvent(processScrollList(currentIndex, "next"),
+                this));
 
         return todosTopBar;
     }
@@ -146,24 +219,18 @@ public class GUI extends JFrame {
         }
     }
 
-    private JPanel initTodoList(int index) {
+    private JPanel initTodoList() {
         JPanel todoListPanel = new JPanel();
         todoListPanel.setBackground(Color.blue);
         todoListPanel.setPreferredSize(new Dimension(WIDTH, 350));
 
         tasksDLM = new DefaultListModel<>();
-        TodoList todoList = planner.getTodosPage().getAllTodoLists().get(index);
+        TodoList todoList = planner.getTodosPage().getAllTodoLists().get(currentIndex);
 
         for (Task t : todoList.getTaskList()) {
             tasksDLM.addElement((todoList.getTaskList().indexOf(t) + 1) + ". " + t.getTag().getName() + ": "
                     + t.getText() + " (due in " + t.getDueIn() + " days)");
         }
-
-        // test text
-        for (int i = 0; i < 20; i++) {
-            tasksDLM.addElement(Integer.toString(i));
-        }
-
         taskList = new JList<>(tasksDLM);
         taskList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         taskList.setSelectedIndex(0);
@@ -182,33 +249,29 @@ public class GUI extends JFrame {
         dueSoon.setMaximumSize(new Dimension(WIDTH, 170));
         dueSoon.setPreferredSize(new Dimension(WIDTH, 170));
 
-        JLabel dueSoonLabel = new JLabel(printDueSoon());
+        dueSoonLabel = new JLabel(printDueSoonLabel());
         dueSoonLabel.setBounds(15, 0, WIDTH - 30, 140);
         dueSoon.add(dueSoonLabel);
 
         return dueSoon;
     }
 
-    private String printDueSoon() {
+    public String printDueSoonLabel() {
         String text = "<html> <h3> Tasks due soon: </h3>";
 
         for (Task t : planner.getDueSoon().getTaskList()) {
             text += "Due in " + t.getDueIn() + " days: " + t.getText() + "<br>";
         }
-
-        // placeholder
-        text += "due in fewf<br>";
-        text += "due in wefwefwfwef<br>";
-        text += "due in fewf<br>";
-        text += "due in fewfw<br>";
-
         text += "</html>";
-
 
         return text;
     }
 
-    private JPanel initTodosBotBar(int currentIndex) {
+    public void refreshDueSoonLabel() {
+        dueSoonLabel.setText(printDueSoonLabel());
+    }
+
+    private JPanel initTodosBotBar() {
         JPanel todosBotBar = new JPanel(new FlowLayout());
         todosBotBar.setBackground(Color.orange);
         todosBotBar.setMaximumSize(new Dimension(WIDTH, BAR_HEIGHT));
@@ -218,23 +281,22 @@ public class GUI extends JFrame {
         JLabel newDueInLabel = new JLabel("Due in:");
         JLabel newTextLabel = new JLabel("Text:");
 
-        JTextField newTagField = new JTextField(3);
-        JTextField newDueInField = new JTextField(2);
-        JTextField newTextField = new JTextField(4);
+        JTextField tagField = new JTextField(3);
+        JTextField dueInField = new JTextField(2);
+        JTextField textField = new JTextField(4);
 
         JButton addButton = new JButton("Add");
         JButton removeButton = new JButton("Remove");
 
-        addButton.addActionListener(new TodosEvents.AddTaskEvent(newTagField, newDueInField, newTextField,
-                currentIndex, planner, tasksDLM));
-        removeButton.addActionListener(new TodosEvents.RemoveTaskEvent(taskList, currentIndex, planner, tasksDLM));
+        addButton.addActionListener(new TodosEvents.AddTaskEvent(tagField, dueInField, textField, currentIndex, this));
+        removeButton.addActionListener(new TodosEvents.RemoveTaskEvent(currentIndex, this));
 
         todosBotBar.add(newTagLabel);
-        todosBotBar.add(newTagField);
+        todosBotBar.add(tagField);
         todosBotBar.add(newDueInLabel);
-        todosBotBar.add(newDueInField);
+        todosBotBar.add(dueInField);
         todosBotBar.add(newTextLabel);
-        todosBotBar.add(newTextField);
+        todosBotBar.add(textField);
 
         todosBotBar.add(addButton);
         todosBotBar.add(removeButton);
@@ -246,14 +308,14 @@ public class GUI extends JFrame {
         JPanel groupsPanel = new JPanel(null);
         groupsPanel.setBackground(Color.orange);
 
-        JLabel groupsLabel = new JLabel(printGroupsPanel());
+        groupsLabel.setText(printGroupsLabel());
         groupsLabel.setBounds(15, 0, WIDTH - 30, 600);
         groupsPanel.add(groupsLabel);
 
         return groupsPanel;
     }
 
-    private String printGroupsPanel() {
+    public String printGroupsLabel() {
         String text = "<html> <h2> Tasks grouped by tag: </h2>";
 
         for (TaskGroup tg : planner.getGroupsPage().getTaskGroups()) {
@@ -262,20 +324,14 @@ public class GUI extends JFrame {
                 text += t.getText() + " (due in " + t.getDueIn() + " days) <br>";
             }
         }
-
-        // placeholder
-        text += "<h3> tagname 1 </h3>";
-        text += "due in wefwefwfwef<br>";
-        text += "due in fewf<br>";
-        text += "due in fewfw<br>";
-        text += "<h3> tagname 1 </h3>";
-        text += "due in wefwefwfwef<br>";
-        text += "due in fewf<br>";
-        text += "due in fewfw<br>";
-
         text += "</html>";
-
+        System.out.println(text);
         return text;
+    }
+
+    public void refreshGroupsLabel() {
+        groupsLabel.setText(printGroupsLabel());
+        System.out.println("r groups");
     }
 
     public JPanel initTagsPanel() {
@@ -299,12 +355,6 @@ public class GUI extends JFrame {
         for (Tag t : planner.getTagsPage().getTagList()) {
             tagsDLM.addElement(t.getName());
         }
-
-        // placeholder text
-        for (int i = 0; i < 30; i++) {
-            tagsDLM.addElement(Integer.toString(i));
-        }
-
         tagList = new JList<>(tagsDLM);
         tagList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tagList.setSelectedIndex(0);
@@ -328,8 +378,8 @@ public class GUI extends JFrame {
         JButton addButton = new JButton("Add");
         JButton removeButton = new JButton("Remove");
 
-        addButton.addActionListener(new TagsEvents.AddTagEvent(newNameField, planner, tagsDLM));
-        removeButton.addActionListener(new TagsEvents.RemoveTagEvent(tagList, planner, tagsDLM));
+        addButton.addActionListener(new TagsEvents.AddTagEvent(newNameField, this));
+        removeButton.addActionListener(new TagsEvents.RemoveTagEvent(this));
 
         tagsBotBar.add(newNameLabel);
         tagsBotBar.add(newNameField);
@@ -337,6 +387,13 @@ public class GUI extends JFrame {
         tagsBotBar.add(removeButton);
 
         return tagsBotBar;
+    }
+
+    public void refreshTagsPanel() {
+        tagsDLM.clear();
+        for (Tag t : planner.getTagsPage().getTagList()) {
+            tagsDLM.addElement(t.getName());
+        }
     }
 
 }

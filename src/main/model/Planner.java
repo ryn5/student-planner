@@ -12,7 +12,6 @@ import model.todospage.TodoList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -35,7 +34,7 @@ public class Planner {
         groupsPage = new TaskGroups();
         tagsPage = new TagList();
         currentDate = Calendar.getInstance().getTime();
-        setFirstDay();
+        setupFirstDay();
     }
 
     // getters
@@ -67,16 +66,12 @@ public class Planner {
     // MODIFIES: this
     // EFFECTS: creates and adds new task to todosPage in TodoList with given dayOfWeek, groupsPage in TaskGroup with
     //          given tag, and dueSoon if given dueIn <= 2
-    public void createTask(String tagName, int dueIn, String text, String dayOfWeek) {
-        try {
-            Task newTask = new Task(getTagsPage().getTag(tagName), dueIn, text);
-            todosPage.addTaskToCorrectDayOfWeek(newTask, dayOfWeek);
-            groupsPage.addTaskToCorrectTaskGroup(newTask);
-            if (dueIn <= 2) {
-                dueSoon.getTaskList().add(newTask);
-            }
-        } catch (TagNotFoundException ignored) {
-            ;
+    public void createTask(String tagName, int dueIn, String text, String dayOfWeek) throws TagNotFoundException {
+        Task newTask = new Task(getTagsPage().getTag(tagName), dueIn, text);
+        todosPage.addTaskToCorrectDayOfWeek(newTask, dayOfWeek);
+        groupsPage.addTaskToCorrectTaskGroup(newTask);
+        if (dueIn <= 2) {
+            dueSoon.getTaskList().add(newTask);
         }
     }
 
@@ -94,13 +89,9 @@ public class Planner {
 
     // MODIFIES: this
     // EFFECTS: create new tag and add it to tagsPage, then create TaskGroup in groupsPage with new tag
-    public void createTag(String name) throws TagAlreadyExistsException {
+    public void createTag(String name) throws TagAlreadyExistsException, TagNotFoundException {
         tagsPage.addTag(name);
-        try {
-            groupsPage.addTaskGroup(tagsPage.getTag(name));
-        } catch (TagNotFoundException ignored) {
-            ;
-        }
+        groupsPage.addTaskGroup(tagsPage.getTag(name));
     }
 
     // MODIFIES: this
@@ -131,7 +122,7 @@ public class Planner {
 
     // MODIFIES: this
     // EFFECTS: cycles TodoLists in allTodoLists so that the first TodoList dayOfWeek matches today's dayOfWeek
-    public void setFirstDay() {
+    public void setupFirstDay() {
         Calendar c = Calendar.getInstance();
         while (!(getDayOfWeekForCalendar(c).equals(getFirstDay()))) {
             cycleTodoLists();

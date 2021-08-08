@@ -1,6 +1,7 @@
 package persistence;
 
 import exceptions.TagAlreadyExistsException;
+import exceptions.TagNotFoundException;
 import model.Planner;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -23,7 +24,7 @@ public class JsonReader {
     }
 
     // EFFECTS: reads source file and returns planner
-    public Planner read() throws IOException, TagAlreadyExistsException {
+    public Planner read() throws IOException, TagAlreadyExistsException, TagNotFoundException {
         String jsonData = readFile();                     // file -> String
         JSONObject jsonObject = new JSONObject(jsonData); // String -> json
         return parsePlanner(jsonObject);                  // json -> planner
@@ -41,7 +42,7 @@ public class JsonReader {
     }
 
     // EFFECTS: parses planner from JSON object and returns it
-    private Planner parsePlanner(JSONObject jsonObject) throws TagAlreadyExistsException {
+    private Planner parsePlanner(JSONObject jsonObject) throws TagAlreadyExistsException, TagNotFoundException {
         Planner planner = new Planner();
 
         Date savedDate = planner.parseDate(jsonObject.getString("currentDate"));
@@ -55,7 +56,7 @@ public class JsonReader {
 
 
     // EFFECTS: parses tags from JSON objects and creates them in planner
-    private void loadTags(Planner planner, JSONObject jsonObject) throws TagAlreadyExistsException {
+    private void loadTags(Planner planner, JSONObject jsonObject) throws TagAlreadyExistsException, TagNotFoundException {
         JSONArray jsonArray = jsonObject.getJSONArray("tags");
         for (Object json : jsonArray) {
             JSONObject jsonTag = (JSONObject) json;
@@ -66,7 +67,7 @@ public class JsonReader {
     }
 
     // EFFECTS: parses tags from JSON objects and creates them in planner
-    private void loadTasks(Planner planner, JSONObject jsonObject) {
+    private void loadTasks(Planner planner, JSONObject jsonObject) throws TagNotFoundException {
         JSONArray jsonArray = jsonObject.getJSONArray("tasks");
         for (Object json : jsonArray) {
             JSONObject jsonTask = (JSONObject) json;

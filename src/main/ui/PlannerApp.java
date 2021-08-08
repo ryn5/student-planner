@@ -157,8 +157,12 @@ public class PlannerApp {
         int newTaskDueIn = Integer.parseInt(input.next());
         String newTaskText = input.nextLine();
 
-        planner.createTask(newTaskTag, newTaskDueIn, newTaskText,
-                planner.getTodosPage().getAllTodoLists().get(currentIndex).getDayOfWeek());
+        try {
+            planner.createTask(newTaskTag, newTaskDueIn, newTaskText,
+                    planner.getTodosPage().getAllTodoLists().get(currentIndex).getDayOfWeek());
+        } catch (TagNotFoundException ignored) {
+            ;
+        }
 
         runTodosPage(currentIndex);
     }
@@ -299,7 +303,7 @@ public class PlannerApp {
         System.out.println("Enter new tag name: ");
         try {
             planner.createTag(input.next());
-        } catch (TagAlreadyExistsException e) {
+        } catch (TagAlreadyExistsException | TagNotFoundException e) {
             System.out.println("Tag with name already exists.");
         } finally {
             runTagsPage();
@@ -328,6 +332,8 @@ public class PlannerApp {
             System.out.println("Couldn't read from file: " + JSON_STORE);
         } catch (TagAlreadyExistsException e) {
             System.out.println("Loaded duplicate tag");
+        } catch (TagNotFoundException e) {
+            System.out.println("Tried to load missing tag");
         }
     }
 

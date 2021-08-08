@@ -3,6 +3,8 @@ package ui.events;
 import exceptions.TagAlreadyExistsException;
 import exceptions.TagNotFoundException;
 import model.Planner;
+import model.tagspage.Tag;
+import ui.GUI;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -12,43 +14,40 @@ public class TagsEvents {
 
     public static class AddTagEvent implements ActionListener {
         private JTextField newNameField;
-        private Planner planner;
-        private DefaultListModel<String> tagsDLM;
+        private GUI gui;
 
-
-        public AddTagEvent(JTextField newNameField, Planner planner, DefaultListModel<String> tagsDLM) {
+        public AddTagEvent(JTextField newNameField, GUI gui) {
             this.newNameField = newNameField;
-            this.planner = planner;
-            this.tagsDLM = tagsDLM;
+            this.gui = gui;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                planner.createTag(newNameField.getText());
-                tagsDLM.addElement(newNameField.getText());
-            } catch (TagAlreadyExistsException ignored) {
+                gui.getPlanner().createTag(newNameField.getText());
+                gui.getTagsDLM().addElement(newNameField.getText());
+                gui.refreshGroupsLabel();
+            } catch (TagAlreadyExistsException | TagNotFoundException ignored) {
                 ;
             }
         }
     }
 
     public static class RemoveTagEvent implements ActionListener {
-        private final JList<String> tagList;
-        private Planner planner;
-        private DefaultListModel<String> tagsDLM;
+        private GUI gui;
 
-        public RemoveTagEvent(JList<String> tagList, Planner planner, DefaultListModel<String> tagsDLM) {
-            this.tagList = tagList;
-            this.planner = planner;
-            this.tagsDLM = tagsDLM;
+        public RemoveTagEvent(GUI gui) {
+            this.gui = gui;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                planner.deleteTag(planner.getTagsPage().getTag(tagList.getSelectedValue()));
-                tagsDLM.removeElement(tagList.getSelectedValue());
+                gui.getPlanner().deleteTag(gui.getPlanner().getTagsPage().getTag(gui.getTagList().getSelectedValue()));
+                gui.getTagsDLM().removeElement(gui.getTagList().getSelectedValue());
+
+                gui.refreshGroupsLabel();
+                gui.refreshTodosPanel();
             } catch (TagNotFoundException ignored) {
                 ;
             }

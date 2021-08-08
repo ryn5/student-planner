@@ -1,10 +1,13 @@
 package ui.events;
 
+import exceptions.TagAlreadyExistsException;
 import model.Planner;
+import ui.GUI;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
 
 public class MenuEvents {
 
@@ -25,28 +28,43 @@ public class MenuEvents {
     }
 
     public static class SaveEvent implements ActionListener {
-        private Planner planner;
+        private GUI gui;
 
-        public SaveEvent(Planner planner) {
-            this.planner = planner;
+        public SaveEvent(GUI gui) {
+            this.gui = gui;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            ;
+            try {
+                gui.getJsonWriter().open();
+                gui.getJsonWriter().write(gui.getPlanner());
+                gui.getJsonWriter().close();
+                System.out.println("Successfully saved Planner to" + gui.getJsonStore());
+            } catch (FileNotFoundException ignored) {
+                ;
+            }
         }
     }
 
     public static class LoadEvent implements ActionListener {
-        private Planner planner;
+        private GUI gui;
 
-        public LoadEvent(Planner planner) {
-            this.planner = planner;
+        public LoadEvent(GUI gui) {
+            this.gui = gui;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            ;
+            try {
+                gui.setPlanner(gui.getJsonReader().read());
+                gui.checkUpdate();
+                gui.refreshTodosPanel();
+                gui.refreshGroupsLabel();
+                gui.refreshTagsPanel();
+            } catch (Exception ignored) {
+                ;
+            }
         }
     }
 

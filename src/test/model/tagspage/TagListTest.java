@@ -59,7 +59,12 @@ public class TagListTest {
     }
 
     @Test
-    void testGetTagNull() throws TagNotFoundException {
-        assertNull(tagList.getTag("Tag 1"));
+    void testGetTagNull() {
+        try {
+            assertNull(tagList.getTag("Tag 1"));
+            fail();
+        } catch (TagNotFoundException e) {
+            ;
+        }
     }
 }

@@ -28,7 +28,7 @@ public class PlannerTest {
     }
 
     @Test
-    void testCreateTag() throws TagAlreadyExistsException {
+    void testCreateTag() throws TagAlreadyExistsException, TagNotFoundException {
         planner.createTag("Tag");
 
         assertEquals(1, planner.getTagsPage().getTagList().size());
@@ -53,14 +53,19 @@ public class PlannerTest {
         planner.createTask("Tag", 2, "task1", "Tuesday");
         planner.createTask("Tag", 3, "task2", "Tuesday");
 
-        planner.deleteTag(planner.getTagsPage().getTag("Tag2"));
-        assertEquals(2, planner.getTodosPage().getTodoList("Tuesday").getTaskList().size());
-        assertEquals(1, planner.getDueSoon().getTaskList().size());
-        assertEquals(1, planner.getGroupsPage().getTaskGroups().size());
+        try {
+            planner.deleteTag(planner.getTagsPage().getTag("Tag2"));
+        } catch (TagNotFoundException e) {
+            ;
+        } finally {
+            assertEquals(2, planner.getTodosPage().getTodoList("Tuesday").getTaskList().size());
+            assertEquals(1, planner.getDueSoon().getTaskList().size());
+            assertEquals(1, planner.getGroupsPage().getTaskGroups().size());
+        }
     }
 
     @Test
-    void testCreateTask() throws TagAlreadyExistsException {
+    void testCreateTask() throws TagAlreadyExistsException, TagNotFoundException {
         planner.createTag("Tag");
 
         planner.createTask("Tag", 2, "task1", "Tuesday");
@@ -72,7 +77,7 @@ public class PlannerTest {
     }
 
     @Test
-    void testDeleteTask() throws TagAlreadyExistsException {
+    void testDeleteTask() throws TagAlreadyExistsException, TagNotFoundException {
         planner.createTag("Tag");
         planner.createTask("Tag", 2, "task1", "Tuesday");
 
@@ -85,12 +90,15 @@ public class PlannerTest {
     }
 
     @Test
-    void testGetDayOfWeekToday() {
-        assertEquals("String".getClass(), planner.getDayOfWeekForCalendar(today).getClass());
+    void testSetupFirstDay() {
+        planner.cycleTodoLists();
+        assertEquals(planner.getDayOfWeekForCalendar(tomorrow), planner.getFirstDay());
+        planner.setupFirstDay();
+        assertEquals(planner.getDayOfWeekForCalendar(today), planner.getFirstDay());
     }
 
     @Test
-    void testUpdateDueDates() throws TagAlreadyExistsException {
+    void testUpdateDueDates() throws TagAlreadyExistsException, TagNotFoundException {
         planner.createTag("Tag");
         planner.createTask("Tag", 2, "task1", "Tuesday");
         planner.createTask("Tag", 0, "task2", "Tuesday");
@@ -103,7 +111,7 @@ public class PlannerTest {
     }
 
     @Test
-    void testClearOverDueTasks() throws TagAlreadyExistsException {
+    void testClearOverDueTasks() throws TagAlreadyExistsException, TagNotFoundException {
         planner.createTag("Tag");
         planner.createTask("Tag", -1, "task1", "Tuesday");
         planner.createTask("Tag", 0, "task2", "Tuesday");
@@ -114,7 +122,7 @@ public class PlannerTest {
     }
 
     @Test
-    void testAddToDueSoon() throws TagAlreadyExistsException {
+    void testAddToDueSoon() throws TagAlreadyExistsException, TagNotFoundException {
         planner.createTag("Tag");
         planner.createTask("Tag", 3, "task1", "Tuesday");
         planner.createTask("Tag", 0, "task2", "Tuesday");
@@ -128,10 +136,10 @@ public class PlannerTest {
     }
 
     @Test
-    void testUpdateDay() throws TagAlreadyExistsException {
+    void testUpdateDay() throws TagAlreadyExistsException, TagNotFoundException {
         planner.createTag("Tag");
-        planner.createTask("Tag", 3, "task1", "Tuesday");
-        planner.createTask("Tag", 0, "task2", "Tuesday");
+        planner.createTask("Tag", 3, "task1", planner.getDayOfWeekForCalendar(tomorrow));
+        planner.createTask("Tag", 0, "task2", planner.getDayOfWeekForCalendar(tomorrow));
 
         planner.updateDay();
 
