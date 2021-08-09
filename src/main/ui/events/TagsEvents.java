@@ -10,6 +10,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+// Action event classes for the tags panel
 public class TagsEvents {
 
     public static class AddTagEvent implements ActionListener {
@@ -21,15 +22,19 @@ public class TagsEvents {
             this.gui = gui;
         }
 
+        // MODIFIES: gui, planner
+        // EFFECT: creates tag in planner and updates gui to display it
         @Override
         public void actionPerformed(ActionEvent e) {
             GUI.playSound(GUI.BUTTON_PRESS_SOUND);
-            try {
-                gui.getPlanner().createTag(newNameField.getText());
-                gui.getTagsDLM().addElement(newNameField.getText());
-                gui.refreshGroupsLabel();
-            } catch (TagAlreadyExistsException | TagNotFoundException ignored) {
-                ;
+            if (!newNameField.getText().equals("")) {
+                try {
+                    gui.getPlanner().createTag(newNameField.getText());
+                    gui.getTagsDLM().addElement(newNameField.getText());
+                    gui.refreshGroupsLabel();
+                } catch (TagAlreadyExistsException | TagNotFoundException ignored) {
+                    ;
+                }
             }
         }
     }
@@ -41,6 +46,8 @@ public class TagsEvents {
             this.gui = gui;
         }
 
+        // MODIFIES: gui, planner
+        // EFFECT: deletes tag from planner and updates gui to display it
         @Override
         public void actionPerformed(ActionEvent e) {
             GUI.playSound(GUI.BUTTON_PRESS_SOUND);

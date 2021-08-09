@@ -18,6 +18,12 @@
             "text": "task2",
             "tagName": "t1",
             "dueIn": 1
+        },
+        {
+            "dayOfWeek": "Friday",
+            "text": "task4",
+            "tagName": "t2",
+            "dueIn": 4
         }
     ],
     "tags": [

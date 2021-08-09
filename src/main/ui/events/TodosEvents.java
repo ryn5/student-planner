@@ -8,6 +8,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+// Action event classes for the todos panel
 public class TodosEvents {
 
     public static class ScrollListEvent implements ActionListener {
@@ -19,6 +20,8 @@ public class TodosEvents {
             this.gui = gui;
         }
 
+        // MODIFIES: gui
+        // EFFECTS: changes which to-do list is being displayed in the todos panel
         @Override
         public void actionPerformed(ActionEvent e) {
             GUI.playSound(GUI.BUTTON_PRESS_SOUND);
@@ -45,6 +48,8 @@ public class TodosEvents {
             this.gui = gui;
         }
 
+        // MODIFIES: gui, planner
+        // EFFECT: creates task in planner and updates gui to display it
         @Override
         public void actionPerformed(ActionEvent e) {
             GUI.playSound(GUI.BUTTON_PRESS_SOUND);
@@ -63,6 +68,8 @@ public class TodosEvents {
         }
     }
 
+    // MODIFIES: gui, planner
+    // EFFECT: deletes task from planner and updates gui to display it
     public static class RemoveTaskEvent implements ActionListener {
         private GUI gui;
         private int currentIndex;

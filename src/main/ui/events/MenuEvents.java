@@ -1,7 +1,5 @@
 package ui.events;
 
-import exceptions.TagAlreadyExistsException;
-import model.Planner;
 import ui.GUI;
 
 import javax.swing.*;
@@ -9,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 
+// Action event classes for the menu panel
 public class MenuEvents {
 
     public static class TabEvent implements ActionListener {
@@ -20,6 +19,8 @@ public class MenuEvents {
             this.index = index;
         }
 
+        // MODIFIES: gui
+        // EFFECTS: sets container pane to selected index
         @Override
         public void actionPerformed(ActionEvent e) {
             GUI.playSound(GUI.BUTTON_PRESS_SOUND);
@@ -35,6 +36,7 @@ public class MenuEvents {
             this.gui = gui;
         }
 
+        // EFFECTS: saves planner to file
         @Override
         public void actionPerformed(ActionEvent e) {
             GUI.playSound(GUI.BUTTON_PRESS_SOUND);
@@ -49,6 +51,8 @@ public class MenuEvents {
         }
     }
 
+    // MODIFIES: gui, planner
+    // EFFECTS: loads planner from file
     public static class LoadEvent implements ActionListener {
         private GUI gui;
 

@@ -15,11 +15,15 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.EtchedBorder;
 import java.awt.*;
 import java.io.File;
 import java.util.Calendar;
 import java.util.Date;
 
+
+// GUI for student planner application
 public class GUI extends JFrame {
     private static final int WIDTH = 400;
     private static final int HEIGHT = 620;
@@ -34,6 +38,10 @@ public class GUI extends JFrame {
     private int currentIndex;
     private JLabel dueSoonLabel;
     private JLabel groupsLabel;
+    private Border loweredEtched;
+    private Border raisedBevel;
+    private Border loweredBevel;
+    private Border redMatte;
 
     private JsonWriter jsonWriter;
     private JsonReader jsonReader;
@@ -86,16 +94,20 @@ public class GUI extends JFrame {
         this.currentIndex = currentIndex;
     }
 
+    // EFFECTS: instantiates GUI
     public GUI() {
         planner = new Planner();
         jsonWriter = new JsonWriter(JSON_STORE);
         jsonReader = new JsonReader(JSON_STORE);
         checkUpdate();
         setupFrame();
+        initBorders();
         initPanels();
         setVisible(true);
     }
 
+    // MODIFIES: planner
+    // EFFECTS: updates planner to current date
     public void checkUpdate() {
         Date today = Calendar.getInstance().getTime();
         while (!planner.formatDate(planner.getCurrentDate()).equals(planner.formatDate(today))) {
@@ -103,6 +115,8 @@ public class GUI extends JFrame {
         }
     }
 
+    // MODIFIES: this
+    // EFFECTS: sets up the JFrame
     private void setupFrame() {
         setSize(WIDTH, HEIGHT);
         setTitle("Planner");
@@ -110,6 +124,17 @@ public class GUI extends JFrame {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
+    // MODIFIES: this
+    // EFFECTS: instantiates border designs
+    private void initBorders() {
+        loweredEtched = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
+        raisedBevel = BorderFactory.createRaisedBevelBorder();
+        loweredBevel = BorderFactory.createLoweredBevelBorder();
+        redMatte = BorderFactory.createMatteBorder(2, 10, 2, 5, Color.red);
+    }
+
+    // MODIFIES: this
+    // EFFECTS: instantiates a tabbed pane and initializes its panels
     public void initPanels() {
         panelContainer = new JTabbedPane();
         currentIndex = 0;
@@ -123,6 +148,8 @@ public class GUI extends JFrame {
         add(panelContainer);
     }
 
+    // MODIFIES: this
+    // EFFECTS: initializes the menu panel
     private JPanel initMenuPanel() {
         JPanel menuPanel = new JPanel();
         menuPanel.add(initMenuLabelPanel());
@@ -131,6 +158,8 @@ public class GUI extends JFrame {
         return menuPanel;
     }
 
+    // MODIFIES: this
+    // EFFECTS: instantiates a panel with the menu label
     private JPanel initMenuLabelPanel() {
         JPanel menuLabelPanel = new JPanel();
         menuLabelPanel.setPreferredSize(new Dimension(WIDTH, 70));
@@ -141,6 +170,8 @@ public class GUI extends JFrame {
         return menuLabelPanel;
     }
 
+    // MODIFIES: this
+    // EFFECTS: instantiates a panel with the menu buttons
     private JPanel initMenuButtonsPanel() {
         JPanel menuButtonsPanel = new JPanel();
         menuButtonsPanel.setPreferredSize(new Dimension(WIDTH, 500));
@@ -172,6 +203,7 @@ public class GUI extends JFrame {
         return menuButtonsPanel;
     }
 
+    // EFFECTS: initializes the todos panel
     public JPanel initTodosPanel() {
         JPanel todosPanel = new JPanel();
         todosPanel.setLayout(new BoxLayout(todosPanel, BoxLayout.Y_AXIS));
@@ -185,15 +217,19 @@ public class GUI extends JFrame {
         return todosPanel;
     }
 
+    // MODIFIES: this
+    // EFFECTS: replaces the todos panel with a newly instantiated one
     public void refreshTodosPanel() {
         panelContainer.remove(1);
         panelContainer.add(initTodosPanel(), "Todos", 1);
     }
 
+    // EFFECTS: instantiates a panel for the top bar of the todos panel
     private JPanel initTodosTopBar() {
         JPanel todosTopBar = new JPanel(new FlowLayout());
         todosTopBar.setBackground(Color.green);
         todosTopBar.setPreferredSize(new Dimension(WIDTH, BAR_HEIGHT));
+        todosTopBar.setBorder(raisedBevel);
 
         JButton prevListButton = new JButton("<");
         JLabel dayLabel = new JLabel(planner.getTodosPage().getAllTodoLists().get(currentIndex).getDayOfWeek());
@@ -211,6 +247,7 @@ public class GUI extends JFrame {
         return todosTopBar;
     }
 
+    // EFFECTS: provides new index for scrolling the to-do lists
     private int processScrollList(int currentIndex, String direction) {
         if (direction.equals("prev")) {
             if (currentIndex == 0) {
@@ -225,10 +262,13 @@ public class GUI extends JFrame {
         }
     }
 
+    // MODIFIES: this
+    // EFFECTS: instantiates the panel for to-do lists and creates a JList for it
     private JPanel initTodoList() {
         JPanel todoListPanel = new JPanel();
         todoListPanel.setBackground(Color.blue);
         todoListPanel.setPreferredSize(new Dimension(WIDTH, 350));
+        todoListPanel.setBorder(loweredEtched);
 
         tasksDLM = new DefaultListModel<>();
         TodoList todoList = planner.getTodosPage().getAllTodoLists().get(currentIndex);
@@ -249,11 +289,13 @@ public class GUI extends JFrame {
         return todoListPanel;
     }
 
+    // MODIFIES: this
+    // EFFECTS: instantiates a panel for the due soon label
     private JPanel initDueSoon() {
         JPanel dueSoon = new JPanel(null);
-        dueSoon.setBackground(Color.red);
         dueSoon.setMaximumSize(new Dimension(WIDTH, 170));
         dueSoon.setPreferredSize(new Dimension(WIDTH, 170));
+        dueSoon.setBorder(redMatte);
 
         dueSoonLabel = new JLabel(printDueSoonLabel());
         dueSoonLabel.setBounds(15, 0, WIDTH - 30, 140);
@@ -262,6 +304,7 @@ public class GUI extends JFrame {
         return dueSoon;
     }
 
+    // EFFECTS: writes items that are due soon from the planner
     public String printDueSoonLabel() {
         String text = "<html> <h3> Tasks due soon: </h3>";
 
@@ -273,15 +316,16 @@ public class GUI extends JFrame {
         return text;
     }
 
+    // MODIFIES: this
+    // EFFECTS: updates text for the due soon label
     public void refreshDueSoonLabel() {
         dueSoonLabel.setText(printDueSoonLabel());
     }
 
+    // EFFECTS: instantiates a panel for the bottom bar of the todos panel
     private JPanel initTodosBotBar() {
         JPanel todosBotBar = new JPanel(new FlowLayout());
-        todosBotBar.setBackground(Color.orange);
-        todosBotBar.setMaximumSize(new Dimension(WIDTH, BAR_HEIGHT));
-        todosBotBar.setPreferredSize(new Dimension(WIDTH, BAR_HEIGHT));
+        setupTodosBotBar(todosBotBar);
 
         JLabel newTagLabel = new JLabel("Tag:");
         JLabel newDueInLabel = new JLabel("Due in:");
@@ -310,9 +354,21 @@ public class GUI extends JFrame {
         return todosBotBar;
     }
 
+    // MODIFIES: todosBotBar
+    // EFFECTS: sets up the todos panel bottom bar
+    private void setupTodosBotBar(JPanel todosBotBar) {
+        todosBotBar.setBackground(Color.orange);
+        todosBotBar.setMaximumSize(new Dimension(WIDTH, BAR_HEIGHT));
+        todosBotBar.setPreferredSize(new Dimension(WIDTH, BAR_HEIGHT));
+        todosBotBar.setBorder(loweredEtched);
+    }
+
+    // MODIFIES: this
+    // EFFECTS: instantiates a panel for the groups label and sets text for it
     private JPanel initGroupsPanel() {
         JPanel groupsPanel = new JPanel(null);
         groupsPanel.setBackground(Color.orange);
+        groupsPanel.setBorder(loweredBevel);
 
         groupsLabel.setText(printGroupsLabel());
         groupsLabel.setBounds(15, 0, WIDTH - 30, 600);
@@ -321,25 +377,27 @@ public class GUI extends JFrame {
         return groupsPanel;
     }
 
+    // EFFECTS: writes text for the groups label
     public String printGroupsLabel() {
         String text = "<html> <h2> Tasks grouped by tag: </h2>";
 
         for (TaskGroup tg : planner.getGroupsPage().getTaskGroups()) {
             text += "<h3>" + tg.getTag().getName() + ": </h3>";
             for (Task t : tg.getTaskList()) {
-                text += t.getText() + " (due in " + t.getDueIn() + " days) <br>";
+                text += "  " + t.getText() + " (due in " + t.getDueIn() + " days) <br>";
             }
         }
         text += "</html>";
-        System.out.println(text);
         return text;
     }
 
+    // MODIFIES: this
+    // EFFECTS: updates text for the groups label
     public void refreshGroupsLabel() {
         groupsLabel.setText(printGroupsLabel());
-        System.out.println("r groups");
     }
 
+    // EFFECTS: initializes the tags panel
     public JPanel initTagsPanel() {
         JPanel tagsPanel = new JPanel();
         tagsPanel.setLayout(new BoxLayout(tagsPanel, BoxLayout.Y_AXIS));
@@ -351,11 +409,14 @@ public class GUI extends JFrame {
         return tagsPanel;
     }
 
+    // MODIFIES: this
+    // EFFECTS: instantiates the panel and JList for tags in the tags panel
     private JPanel initTagList() {
         JPanel tagListPanel = new JPanel();
-        tagListPanel.setBackground(Color.blue);
+        tagListPanel.setBackground(Color.cyan);
         tagListPanel.setMaximumSize(new Dimension(WIDTH, HEIGHT - BAR_HEIGHT));
         tagListPanel.setPreferredSize(new Dimension(WIDTH, HEIGHT - BAR_HEIGHT));
+        tagListPanel.setBorder(loweredEtched);
 
         tagsDLM = new DefaultListModel<>();
         for (Tag t : planner.getTagsPage().getTagList()) {
@@ -373,11 +434,14 @@ public class GUI extends JFrame {
         return tagListPanel;
     }
 
+    // MODIFIES: this
+    // EFFECTS: instantiates the tags panel bottom bar
     private JPanel initTagsBotBar() {
         JPanel tagsBotBar = new JPanel(new FlowLayout());
         tagsBotBar.setBackground(Color.orange);
         tagsBotBar.setMaximumSize(new Dimension(WIDTH, BAR_HEIGHT));
         tagsBotBar.setPreferredSize(new Dimension(WIDTH, BAR_HEIGHT));
+        tagsBotBar.setBorder(loweredEtched);
 
         JLabel newNameLabel = new JLabel("New tag name:");
         JTextField newNameField = new JTextField(11);
@@ -395,6 +459,8 @@ public class GUI extends JFrame {
         return tagsBotBar;
     }
 
+    // MODIFIES: this
+    // EFFECTS: updates JList for the tags panel
     public void refreshTagsPanel() {
         tagsDLM.clear();
         for (Tag t : planner.getTagsPage().getTagList()) {
@@ -402,7 +468,9 @@ public class GUI extends JFrame {
         }
     }
 
+
     // method was sourced from http://suavesnippets.blogspot.com/2011/06/add-sound-on-jbutton-click-in-java.html
+    // EFFECTS: plays the given sound file
     public static void playSound(String soundFile) {
         try {
             AudioInputStream audioInputStream = AudioSystem

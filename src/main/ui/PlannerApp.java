@@ -121,7 +121,7 @@ public class PlannerApp {
         processTodosCommand(input.next(), index);
     }
 
-    // MODIFIES: this, Planner
+    // MODIFIES: this, planner
     // EFFECTS: processes user command in Todos Page
     private void processTodosCommand(String command, int currentIndex) {
         switch (command) {
@@ -147,7 +147,7 @@ public class PlannerApp {
         }
     }
 
-    // MODIFIES: this, Planner
+    // MODIFIES: this, planner
     // EFFECTS: creates new task in current to-do list and rest of Planner
     private void processAddTask(int currentIndex) {
         System.out.println("Enter details in the following format excluding parentheses: "
@@ -167,7 +167,7 @@ public class PlannerApp {
         runTodosPage(currentIndex);
     }
 
-    // MODIFIES: this, Planner
+    // MODIFIES: this, planner
     // EFFECTS: deletes all instances of task at given index in current to-do list from Planner
     private void processDelTask(int currentIndex) {
         System.out.println("Enter number of task to be deleted: ");
@@ -273,7 +273,7 @@ public class PlannerApp {
         processTagsCommand(input.next());
     }
 
-    // MODIFIES: this, Planner
+    // MODIFIES: this, planner
     // EFFECTS: processes user command in Tags Page
     private void processTagsCommand(String command) {
         switch (command) {
@@ -299,6 +299,8 @@ public class PlannerApp {
         }
     }
 
+    // MODIFIES: planner
+    // EFFECTS: creates a tag in planner
     private void processAddTag() {
         System.out.println("Enter new tag name: ");
         try {
