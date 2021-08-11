@@ -32,3 +32,9 @@ dedicated application that I can use to keep track of everything I need to do ea
 - As a user, I want to be able to view a work-list of my tasks grouped by tag
 - As a user, I want to be able to save my todo-lists and tags to file
 - As a user, I want to be able to load my todo-lists and tags from file
+
+## Phase 4: Task 2
+I chose to make my TagList class more robust by having getTag() throw a TagNotFoundException and having addTag() 
+throw a TagAlreadyExistsException.  These exceptions are thrown when called in other methods such as Planner.createTag()
+and Planner.createTask(), both of which are called in the console UI and GUI classes.  Tests for these exceptions can 
+be found in PlannerTest and TagListTest.
