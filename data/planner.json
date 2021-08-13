@@ -1,34 +1,34 @@
 {
-    "currentDate": "08/08/2021",
-    "tasks": [
-        {
-            "dayOfWeek": "Monday",
-            "text": "task3",
-            "tagName": "t3",
-            "dueIn": 2
-        },
-        {
-            "dayOfWeek": "Wednesday",
-            "text": "task1",
-            "tagName": "t1",
-            "dueIn": 2
-        },
-        {
-            "dayOfWeek": "Wednesday",
-            "text": "task2",
-            "tagName": "t1",
-            "dueIn": 1
-        },
-        {
-            "dayOfWeek": "Friday",
-            "text": "task4",
-            "tagName": "t2",
-            "dueIn": 4
-        }
-    ],
-    "tags": [
-        {"name": "t1"},
-        {"name": "t2"},
-        {"name": "t3"}
-    ]
+  "currentDate": "08/08/2021",
+  "tasks": [
+    {
+      "dayOfWeek": "Monday",
+      "text": "task3",
+      "tagName": "t3",
+      "dueIn": 2
+    },
+    {
+      "dayOfWeek": "Wednesday",
+      "text": "task1",
+      "tagName": "t1",
+      "dueIn": 2
+    },
+    {
+      "dayOfWeek": "Wednesday",
+      "text": "task2",
+      "tagName": "t1",
+      "dueIn": 1
+    },
+    {
+      "dayOfWeek": "Friday",
+      "text": "task4",
+      "tagName": "t2",
+      "dueIn": 4
+    }
+  ],
+  "tags": [
+    {"name": "t1"},
+    {"name": "t2"},
+    {"name": "t3"}
+  ]
 }

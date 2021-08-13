@@ -2,9 +2,9 @@
 
 ## Proposal
 
-This application is geared towards secondary and post secondary students to organize and plan out their daily schedules.
-As a full-time post secondary student, this project is of interest to me because it would be greatly useful to have a
-dedicated application that I can use to keep track of everything I need to do each day.
+This application is geared towards helping secondary and post secondary students organize and plan out their daily 
+schedules.  As a full-time post secondary student, this project is of interest to me because it would be greatly useful 
+to have a dedicated application that I can use to keep track of everything I need to do each day.
 
 **Functionality:**
 
@@ -38,3 +38,8 @@ I chose to make my TagList class more robust by having getTag() throw a TagNotFo
 throw a TagAlreadyExistsException.  These exceptions are thrown when called in other methods such as Planner.createTag()
 and Planner.createTask(), both of which are called in the console UI and GUI classes.  Tests for these exceptions can 
 be found in PlannerTest and TagListTest.
+
+## Phase 4: Task 3
+If I had more time, I would have liked to create more helper functions in the Planner class to improve readability and
+reduce dependency/coupling.  In terms of the class hierarchy, I'm happy with the current design and with how everything 
+is organized.
