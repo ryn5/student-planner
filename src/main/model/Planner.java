@@ -63,17 +63,23 @@ public class Planner {
         this.currentDate = currentDate;
     }
 
+    // EFFECTS: returns tag with given name from tagsPage
+    private Tag findTag(String tagName) throws TagNotFoundException {
+        return tagsPage.getTag(tagName);
+    }
+
     // MODIFIES: this
     // EFFECTS: creates and adds new task to todosPage in TodoList with given dayOfWeek, groupsPage in TaskGroup with
     //          given tag, and dueSoon if given dueIn <= 2
     public void createTask(String tagName, int dueIn, String text, String dayOfWeek) throws TagNotFoundException {
-        Task newTask = new Task(getTagsPage().getTag(tagName), dueIn, text);
+        Task newTask = new Task(findTag(tagName), dueIn, text);
         todosPage.addTaskToCorrectDayOfWeek(newTask, dayOfWeek);
         groupsPage.addTaskToCorrectTaskGroup(newTask);
         if (dueIn <= 2) {
             dueSoon.getTaskList().add(newTask);
         }
     }
+
 
     // MODIFIES: this
     // EFFECTS: removes given task from todosPage, dueSoon, and groupsPage
@@ -91,7 +97,7 @@ public class Planner {
     // EFFECTS: create new tag and add it to tagsPage, then create TaskGroup in groupsPage with new tag
     public void createTag(String name) throws TagAlreadyExistsException, TagNotFoundException {
         tagsPage.addTag(name);
-        groupsPage.addTaskGroup(tagsPage.getTag(name));
+        groupsPage.addTaskGroup(findTag(name));
     }
 
     // MODIFIES: this
