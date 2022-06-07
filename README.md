@@ -1,4 +1,5 @@
 # Student Planner
+210 Course Project
 
 ## Proposal
 
